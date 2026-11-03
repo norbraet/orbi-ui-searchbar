@@ -2,19 +2,17 @@
   :root {
     --space-page: var(--space-6);
     --space-section: var(--space-12);
-
     --space-component-nano: var(--space-1);
     --space-component-xs: var(--space-2);
     --space-component-sm: var(--space-3);
     --space-component-md: var(--space-4);
     --space-component-lg: var(--space-5);
     --space-component-xl: var(--space-6);
-
     --space-content: var(--space-10);
-
     --size-control-sm: var(--space-8);
+    --size-control-md: 2.25rem;
+    --size-control-lg: 2.75rem;
     --size-icon-sm: var(--space-5);
-
     --layout-max-width: 72rem;
     --layout-sidebar-width: 16rem;
     --layout-gap: var(--space-6);

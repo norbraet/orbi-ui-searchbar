@@ -1,0 +1,58 @@
+@layer themes {
+  /* Match dark-mode specificity and rebind aliases for nested theme scopes. */
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    :root:root,
+    [data-theme][data-theme] {
+      --material-regular-background: var(--color-surface-raised);
+      --material-clear-background: var(--color-surface-raised);
+      --material-regular-filter: none;
+      --material-clear-filter: none;
+      --material-border: var(--color-border-strong);
+      --material-highlight: transparent;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    :root:root,
+    [data-theme][data-theme] {
+      --color-text-muted: var(--color-text);
+      --color-text-subtle: var(--color-text);
+      --color-border: var(--color-text);
+      --color-border-strong: var(--color-text);
+      --material-shadow: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :root:root,
+    [data-theme][data-theme] {
+      --color-bg: Canvas;
+      --color-bg-subtle: Canvas;
+      --color-bg-muted: Canvas;
+      --color-surface: Canvas;
+      --color-surface-raised: Canvas;
+      --color-surface-sunken: Canvas;
+      --color-text: CanvasText;
+      --color-text-muted: CanvasText;
+      --color-text-subtle: CanvasText;
+      --color-text-inverse: Canvas;
+      --color-border: CanvasText;
+      --color-border-strong: CanvasText;
+      --color-primary: Highlight;
+      --color-primary-hover: Highlight;
+      --color-primary-active: Highlight;
+      --color-primary-subtle: Canvas;
+      --color-on-primary: HighlightText;
+      --color-focus: Highlight;
+      --color-selection: Highlight;
+      --color-selection-text: HighlightText;
+      --material-regular-background: Canvas;
+      --material-clear-background: Canvas;
+      --material-regular-filter: none;
+      --material-clear-filter: none;
+      --material-border: CanvasText;
+      --material-highlight: transparent;
+      --material-shadow: none;
+    }
+  }
+}

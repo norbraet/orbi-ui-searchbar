@@ -1,11 +1,6 @@
 @layer base {
   :root {
-    font-family: var(--font-family-sans);
-    color-scheme: light;
-  }
-
-  [data-theme='dark'] {
-    color-scheme: dark;
+    font-family: var(--text-body-font);
   }
 
   body {
@@ -58,9 +53,8 @@
   }
 
   :focus-visible {
-    outline: var(--focus-ring-width, 2px) solid var(--color-focus);
-    outline-offset: var(--focus-ring-offset, 2px);
-    border-radius: var(--radius-focus);
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
   }
 
   .container {
@@ -77,7 +71,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :root {
+    :root,
+    [data-theme] {
       --motion-duration-instant: 0ms;
       --motion-duration-fast: 0ms;
       --motion-duration-normal: 0ms;
@@ -86,8 +81,12 @@
       --motion-duration-slower: 0ms;
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
     }
   }
 }

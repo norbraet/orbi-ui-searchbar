@@ -1,12 +1,11 @@
 @layer primitives {
   :root {
     --font-family-sans:
-      system-ui, -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, 'Helvetica Neue', arial,
+      -apple-system, blinkmacsystemfont, system-ui, 'Segoe UI', roboto, 'Helvetica Neue', arial,
       sans-serif;
     --font-family-mono:
       ui-monospace, sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New',
       monospace;
-
     --font-size-xs: 0.75rem;
     --font-size-caption: 0.8125rem;
     --font-size-sm: 0.875rem;
@@ -20,23 +19,20 @@
     --font-size-4xl: 2.25rem;
     --font-size-5xl: 3rem;
     --font-size-6xl: 3.75rem;
-
     --font-weight-regular: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
-
     --line-height-none: 1;
     --line-height-tight: 1.2;
     --line-height-snug: 1.4;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.7;
     --line-height-loose: 2;
-
     --letter-spacing-tight: -0.01em;
-    --letter-spacing-ui: -0.02em;
-    --letter-spacing-heading: -0.04em;
-    --letter-spacing-display: -0.06em;
+    --letter-spacing-ui: 0em;
+    --letter-spacing-heading: -0.015em;
+    --letter-spacing-display: -0.025em;
     --letter-spacing-normal: 0em;
     --letter-spacing-wide: 0.02em;
     --letter-spacing-label: 0.06em;

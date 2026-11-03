@@ -1,0 +1,8 @@
+/* Web approximations, not measurements of Apple's native material renderer. */
+@layer primitives {
+  :root {
+    --material-blur-regular: 24px;
+    --material-blur-clear: 12px;
+    --material-saturation: 1.4;
+  }
+}

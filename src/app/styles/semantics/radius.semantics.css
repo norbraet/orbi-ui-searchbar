@@ -1,14 +1,16 @@
 @layer semantics {
   :root {
-    --radius-button: var(--radius-md);
-    --radius-input: var(--radius-md);
-    --radius-card: var(--radius-lg);
-    --radius-menu: var(--radius-lg);
-    --radius-modal: var(--radius-xl);
+    /* Floating controls use capsules; nested content keeps smaller corners. */
+    --radius-button: var(--radius-full);
+    --radius-input: var(--radius-full);
+    --radius-card: var(--radius-xl);
+    --radius-menu: var(--radius-xl);
+    --radius-modal: var(--radius-2xl);
     --radius-toast: var(--radius-xl);
     --radius-badge: var(--radius-full);
-    --radius-tooltip: var(--radius-sm);
+    --radius-tooltip: var(--radius-md);
     --radius-tag: var(--radius-sm);
     --radius-focus: var(--radius-sm);
+    --radius-result: var(--radius-lg);
   }
 }

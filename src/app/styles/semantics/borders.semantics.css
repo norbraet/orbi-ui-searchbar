@@ -3,5 +3,7 @@
     --border-width-thin: 1px;
     --border-width-accent: 2px;
     --border-width-indicator: 3px;
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 2px;
   }
 }

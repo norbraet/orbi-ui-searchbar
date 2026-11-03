@@ -1,0 +1,24 @@
+@layer semantics {
+  :root,
+  [data-theme] {
+    /* Opaque by default: translucency requires backdrop-filter support. */
+    --material-regular-background: var(--color-surface-raised);
+    --material-clear-background: var(--color-surface-raised);
+    --material-regular-filter: none;
+    --material-clear-filter: none;
+    --material-border: var(--color-glass-border);
+    --material-highlight: var(--color-glass-highlight);
+    --material-shadow: inset 0 1px 0 var(--material-highlight), var(--shadow-modal);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    :root,
+    [data-theme] {
+      --material-regular-background: var(--color-glass-regular);
+      --material-clear-background: var(--color-glass-clear);
+      --material-regular-filter: blur(var(--material-blur-regular))
+        saturate(var(--material-saturation));
+      --material-clear-filter: blur(var(--material-blur-clear)) saturate(var(--material-saturation));
+    }
+  }
+}

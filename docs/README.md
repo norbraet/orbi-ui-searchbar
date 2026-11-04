@@ -14,6 +14,8 @@ direction; it is not a fixed backlog or a commitment to a particular design or i
 - Support different kinds of content through a consistent search experience.
 - Explore useful interactions that go beyond a list of links while keeping the interface focused.
 - Build a frontend component that can later connect to a real search backend.
+- Make the component reusable across the maintainer's Vue projects as part of their own Vue component
+  library, with a public API independent of this demo application's providers.
 
 ## Intended capabilities
 
@@ -87,6 +89,9 @@ responses. Use the existing Storybook and testing tools where they help demonstr
 behaviors.
 
 ## Decisions and evolving scope
+
+The [search palette implementation plan](search-palette-plan.md) describes the proposed delivery steps
+and separation between behavior, presentation, and the mocked search service.
 
 Update this document as the product direction changes. Keep detailed delivery tasks and implementation
 choices out of this overview.

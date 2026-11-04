@@ -22,11 +22,11 @@
     "lint:css": "stylelint 'src/**/*.{vue,css}'",
     "lint:css:fix": "stylelint 'src/**/*.{vue,css}' --fix",
     "lint:css:staged": "stylelint",
-    "typecheck": "vue-tsc --noEmit",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json",
     "hooks:install": "lefthook install",
     "hooks:uninstall": "lefthook uninstall",
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc --noEmit -p tsconfig.app.json && vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

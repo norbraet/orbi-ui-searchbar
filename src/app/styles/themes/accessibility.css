@@ -1,4 +1,17 @@
 @layer themes {
+  @media (prefers-reduced-motion: reduce) {
+    :root,
+    [data-theme] {
+      --motion-duration-instant: 0ms;
+      --motion-duration-fast: 0ms;
+      --motion-duration-normal: 0ms;
+      --motion-duration-moderate: 0ms;
+      --motion-duration-slow: 0ms;
+      --motion-duration-slower: 0ms;
+      --motion-duration-feedback: 0ms;
+    }
+  }
+
   /* Match dark-mode specificity and rebind aliases for nested theme scopes. */
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     :root:root,

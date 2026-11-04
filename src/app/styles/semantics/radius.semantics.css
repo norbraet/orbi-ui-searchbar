@@ -1,8 +1,9 @@
 @layer semantics {
   :root {
-    /* Floating controls use capsules; nested content keeps smaller corners. */
+    /* Prominent actions use capsules; compact controls use rounded rectangles. */
     --radius-button: var(--radius-full);
-    --radius-input: var(--radius-full);
+    --radius-input: var(--radius-lg);
+    --radius-control: var(--radius-md);
     --radius-card: var(--radius-xl);
     --radius-menu: var(--radius-xl);
     --radius-modal: var(--radius-2xl);

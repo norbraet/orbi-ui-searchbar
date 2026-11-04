@@ -1,8 +1,13 @@
 @layer semantics {
-  :root {
+  :root,
+  [data-theme] {
     --motion-fast: var(--motion-duration-fast);
     --motion-normal: var(--motion-duration-normal);
     --motion-emphasized: var(--motion-duration-moderate);
+    --motion-pulse: var(--motion-duration-feedback);
+    --motion-distance-sm: var(--space-1);
+    --motion-distance-md: var(--space-2);
+    --motion-scale-enter: 0.98;
     --motion-ease-standard: var(--motion-ease-in-out);
     --motion-ease-enter: var(--motion-ease-out);
     --motion-ease-exit: var(--motion-ease-in);

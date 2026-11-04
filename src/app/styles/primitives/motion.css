@@ -6,6 +6,7 @@
     --motion-duration-moderate: 300ms;
     --motion-duration-slow: 400ms;
     --motion-duration-slower: 600ms;
+    --motion-duration-feedback: 1000ms;
     --motion-ease-linear: linear;
     --motion-ease-in: cubic-bezier(0.42, 0, 1, 1);
     --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);

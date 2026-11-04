@@ -7,7 +7,7 @@ const home = {
   searchDemo: {
     title: 'Finde deinen nächsten Gedanken.',
     description:
-      'Suchpaletten-Demo mit vorbereiteten Antworten. Wähle ein Szenario, um die Zustände der Komponente auszuprobieren.',
+      'Suche nach „decision“, „design“, „tokens“ oder „deployment“, oder wähle ein Szenario für leere Ergebnisse und Fehlerzustände.',
     open: 'Arbeitsbereich durchsuchen',
     scenario: 'Demo-Szenario',
     default: 'Ergebnisse und Vorschläge',

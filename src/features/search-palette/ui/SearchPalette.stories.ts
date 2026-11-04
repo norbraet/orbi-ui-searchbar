@@ -29,10 +29,13 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Open search' }))
     const input = await canvas.findByRole('combobox', { name: 'Search' })
     await expect(input).toHaveFocus()
+    await canvas.findByRole('button', { name: 'Architecture decisions' })
+    await expect(canvas.queryAllByRole('option')).toHaveLength(0)
+    await userEvent.type(input, 'search')
     await canvas.findByRole('option', { name: /Search behavior and presentation/ })
     await userEvent.keyboard('{ArrowDown}')
     await waitFor(() =>
-      expect(canvas.getByRole('heading', { name: 'Designing with materials' })).toBeVisible()
+      expect(canvas.getByRole('heading', { name: 'Keyboard interaction checklist' })).toBeVisible()
     )
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(canvas.getByRole('button', { name: 'Open search' })).toHaveFocus())
@@ -41,7 +44,21 @@ export const Default: Story = {
 export const Empty: Story = { args: { search: createMockSearchService('empty') } }
 export const Error: Story = { args: { search: createMockSearchService('error') } }
 export const Loading: Story = { args: { search: createMockSearchService('slow') } }
-export const MissingPreview: Story = { args: { search: createMockSearchService('no-preview') } }
+export const MissingPreview: Story = {
+  args: { search: createMockSearchService('no-preview') },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Open search' }))
+    await userEvent.click(await canvas.findByRole('button', { name: 'Design guidelines' }))
+    await canvas.findByRole('option', { name: /Designing with materials/ })
+    await waitFor(() =>
+      expect(canvas.getByText('No preview available. Open the result to read more.')).toBeVisible()
+    )
+    await expect(canvas.queryByRole('img')).not.toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Open search' })).toHaveFocus())
+  },
+}
 export const CustomSlots: Story = {
   render: (args) => ({
     components: { SearchPalette },
@@ -63,14 +80,15 @@ export const CustomSlots: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Open search' }))
+    await userEvent.type(canvas.getByRole('combobox'), 'search')
     await canvas.findByRole('option', { name: 'Selected: Search behavior and presentation' })
     await userEvent.keyboard('{ArrowDown}')
     await expect(
-      canvas.getByRole('option', { name: 'Selected: Designing with materials' })
+      canvas.getByRole('option', { name: 'Selected: Keyboard interaction checklist' })
     ).toHaveAttribute('aria-selected', 'true')
     await waitFor(() =>
       expect(
-        canvas.getByRole('heading', { name: 'Details: Designing with materials' })
+        canvas.getByRole('heading', { name: 'Details: Keyboard interaction checklist' })
       ).toBeVisible()
     )
     await userEvent.keyboard('{Escape}')

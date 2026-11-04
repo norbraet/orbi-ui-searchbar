@@ -6,7 +6,7 @@ const home = {
   searchDemo: {
     title: 'Find your next thought.',
     description:
-      'Search palette playground. Responses are scripted fixtures; try a scenario to explore the component states.',
+      'Try “decision”, “design”, “tokens”, or “deployment”, or choose a scenario to explore empty and error states.',
     open: 'Search workspace',
     scenario: 'Demo scenario',
     default: 'Results and suggestions',

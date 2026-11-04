@@ -27,9 +27,15 @@ a separate step.
 ```
 
 The service receives `{ query, context, signal }` and returns a promise for `{ results, suggestions? }`.
-The empty query is sent immediately on open, allowing the service to provide starting items and
-suggestions. Subsequent query changes are debounced; results retain the service's order. There is no
-frontend indexing, filtering, or ranking. A changed context invalidates the current search.
+The empty query is sent immediately on open to obtain suggestions. Empty or whitespace-only input
+shows suggestions only: provider result items are ignored, no item is selected, and the preview,
+result count, and no-matches message are hidden. Clearing a query requests suggestions immediately.
+Subsequent non-empty query changes are debounced; results retain the service's order. The component
+does not index, filter, or rank responses. A changed context invalidates the current search.
+
+New result sets start at the top of the results pane, and selecting another result resets its preview
+to the top. Only explicit keyboard navigation scrolls to reveal an active row; automatic selection
+and pointer hover do not scroll the palette or its ancestors during height transitions.
 
 Each result has a stable unique `id`, `title`, `url`, `kind`, `source`, and `location`. Optional `excerpt`
 and `preview` fields enrich presentation. Preview data can include text, an image URL and alternative
@@ -74,7 +80,11 @@ CSS styling approximates Liquid Glass; it does not reproduce native macOS render
 use `--radius-control`, while inputs use `--radius-input`.
 
 Opening and closing use a short fade and scale, with a matching backdrop fade. Result arrivals and
-preview changes fade into place, and the body keeps a stable height while requests are pending.
+preview changes fade into place. The body animates to the measured content height up to a viewport
+limit: suggestions, no matches, and errors stay compact, while results and previews expand as needed.
+The palette sits 20% down the viewport on desktop, with the input anchored while results expand.
+Small screens use a smaller top gutter to preserve room for content. The previous settled height is retained while another
+non-empty query is pending. Image loads, custom slots, and responsive wrapping update the measurement.
 Closing cancels search immediately, preserves a non-interactive visual snapshot for the exit, then
 restores focus. Reopening interrupts that exit safely. No animation timing is part of the headless
 model. Tune timing through shared `--motion-fast`, `--motion-normal`, `--motion-emphasized`, and easing
@@ -94,12 +104,26 @@ a scope. It is safe to construct during server rendering; call `open()` on the c
 
 ## Demo and verification
 
-The home page supplies scripted mock responses and selectable success, empty, error, slow, and
-missing-preview scenarios. All normal queries intentionally return the same scripted result set;
-the demo does not simulate relevance. The illustrated thumbnail is a local mock, not a captured Apple
-page. Mocks have their own entry in `mocks/` and are absent from the production public entry.
+The home page supplies a mock backend with 32 fixtures across decisions, documents, links, issues,
+notes, and design files. Empty input shows only example query suggestions. Typing
+searches the full catalog using case/accent-insensitive substring matching across title, content kind,
+source, location, excerpt, preview text, and URL. Every query word must match; fixture order is
+preserved. This lightweight matcher lives only in `mocks/`, not in the reusable component or its public
+entry, and does not provide production ranking, fuzzy search, or indexing.
+
+Try `decision`, `design`, `tokens`, `deployment`, `Figma`, or `release checklist`. `canary` demonstrates
+matching preview content, and `ubergabe` finds the German handoff note. Unknown queries return no
+results and offer recovery suggestions separately. Clearing the input restores suggestions only.
+
+Empty, error, and slow scenarios remain available. The missing-preview scenario searches the same
+catalog and uses the same suggestions as normal search, but omits preview metadata from returned
+results to exercise the fallback. It does not alter the fixture catalog. The illustrated thumbnail is
+a local mock, not a captured Apple page.
+Additional workspace fixture destinations open the demo guide with an item identifier; they are not
+separate backend document pages.
 
 - `model/useSearchPalette.test.ts`: Node tests for requests, races, selection, context, and lifecycle.
+- `mocks/index.test.ts`: fixture matching, suggestions, fallback scenarios, cancellation, and isolation.
 - `ui/SearchPalette.test.ts`: provider-free server-rendering check.
 - `ui/SearchPalette.stories.ts`: component examples and a keyboard interaction check.
 - `e2e/specs/search-palette.spec.ts`: actual browser behavior using `e2e/fixtures/search-palette.html`,

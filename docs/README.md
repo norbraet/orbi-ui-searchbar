@@ -31,7 +31,8 @@ as we build:
   metadata, or supplied thumbnails, with a useful fallback when a preview is unavailable.
 - **Open and act:** Open the provided destination from a result. Supporting actions, such as copying
   a link or opening a new tab, can be added where useful.
-- **Guide discovery:** Offer suggestions and useful starting points, such as recent or pinned items.
+- **Guide discovery:** Show query suggestions before typing; searchable context items appear only
+  after a non-empty query.
 - **Refine searches:** Allow users to narrow the search by source, content type, or another meaningful
   scope without making the interface cumbersome.
 - **Handle real conditions:** Provide clear loading, empty, error, and unavailable-content states.
@@ -59,10 +60,11 @@ The frontend owns presentation and interaction: query input, selection, scope co
 display, navigation, and local interface state.
 
 A replaceable mocked service supplies search responses, including ordered results, suggestions,
-preview content, and any relevance explanations or relationships. We are not implementing indexing,
-ranking, or a search algorithm in the frontend. Fixtures should provide predictable scenarios for
-developing and validating the component, including delays, failures, and responses arriving out of
-order.
+preview content, and any relevance explanations or relationships. The reusable component does not
+implement indexing, matching, or ranking. For realistic exploration, the demo mock service performs
+simple matching over a fixed fixture catalog; production search algorithms remain outside scope.
+Fixtures should provide predictable scenarios for developing and validating the component, including
+delays, failures, and responses arriving out of order.
 
 Website previews use supplied metadata and thumbnail assets in this project. Generating screenshots,
 fetching arbitrary pages, and guaranteeing live embedded previews are outside the current scope.

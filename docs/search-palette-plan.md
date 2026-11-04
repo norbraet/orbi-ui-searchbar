@@ -4,11 +4,16 @@ Working branch: `feat/search-palette`.
 
 ## Current implementation
 
-The first complete flow is implemented: service contract and scripted mocks, headless behavior,
+The first complete flow is implemented: service contract and searchable mock fixtures, headless behavior,
 controlled Vue component, keyboard/pointer navigation, previews, suggestions, loading/empty/error
 states, and a home-page demo. The reusable component uses the shared token foundation and has no application-provider
 dependency. Closing resets the search; scope filters, history/pinning, and library distribution
 packaging remain follow-up work.
+
+The demo mock now searches 32 fixtures, with suggestions only for an empty query. Simple matching
+lives behind the service boundary; unknown queries produce an empty state with separate recovery
+suggestions. Blank or whitespace-only input never exposes context items, a preview, or a result count.
+This is a fixture simulation, not production indexing or relevance ranking.
 
 See the [component usage guide](../src/features/search-palette/README.md). Behavior tests run in Node;
 browser tests use an isolated Vue consumer with shared tokens but no app providers, reset, or base styles. Storybook includes

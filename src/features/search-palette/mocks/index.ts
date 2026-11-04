@@ -16,23 +16,17 @@ function normalize(value: string): string {
 }
 
 function searchableText(result: SearchResult): string {
-  return normalize(
-    [
-      result.title,
-      result.kind,
-      result.source,
-      result.location,
-      result.excerpt,
-      result.preview?.text,
-      result.url,
-    ]
-      .filter(Boolean)
-      .join(' ')
-  )
-}
-
-function copyResult(result: SearchResult): SearchResult {
-  return { ...result, ...(result.preview ? { preview: { ...result.preview } } : {}) }
+  return [
+    result.title,
+    result.kind,
+    result.source,
+    result.location,
+    result.excerpt,
+    result.preview?.text,
+    result.url,
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 /** Demo-only fixture matching behind the service boundary; no production index or ranking. */
@@ -55,29 +49,25 @@ export function createMockSearchService(scenario: MockScenario = 'default'): Sea
             return
           }
           const terms = normalize(query).split(/\s+/u).filter(Boolean)
+          const matches = (text: string) => {
+            const normalized = normalize(text)
+            return terms.every((term) => normalized.includes(term))
+          }
           const results =
-            scenario === 'empty'
+            scenario === 'empty' || !terms.length
               ? []
-              : terms.length
-                ? mockSearchResults.filter((result) =>
-                    terms.every((term) => searchableText(result).includes(term))
-                  )
-                : []
+              : mockSearchResults.filter((result) => matches(searchableText(result)))
           const relatedSuggestions = terms.length
             ? suggestions.filter(
                 (suggestion) =>
                   normalize(suggestion.query) !== terms.join(' ') &&
-                  terms.every((term) =>
-                    normalize(suggestion.label + ' ' + suggestion.query).includes(term)
-                  )
+                  matches(suggestion.label + ' ' + suggestion.query)
               )
             : suggestions
           resolve({
-            results: results.map((result) => {
-              const copy = copyResult(result)
-              if (scenario === 'no-preview') delete copy.preview
-              return copy
-            }),
+            results: results.map(({ preview, ...result }) =>
+              preview && scenario !== 'no-preview' ? { ...result, preview: { ...preview } } : result
+            ),
             // Recovery suggestions are separate from results; never substitute unrelated matches.
             suggestions: (results.length || relatedSuggestions.length
               ? relatedSuggestions

@@ -41,8 +41,10 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     state.error = null
   }
 
+  const isCurrentRequest = (id: number) => !disposed && state.isOpen && id === requestId
+
   async function request(id: number) {
-    if (disposed || !state.isOpen || id !== requestId) return
+    if (!isCurrentRequest(id)) return
 
     const activeController = new AbortController()
     controller = activeController
@@ -55,7 +57,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
         signal: activeController.signal,
       })
 
-      if (disposed || !state.isOpen || id !== requestId) return
+      if (!isCurrentRequest(id)) return
 
       // Empty input is a suggestions-only state, even if a provider returns items.
       state.results = query ? response.results : []
@@ -63,7 +65,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
       state.selectedId = state.results[0]?.id ?? null
       state.status = 'success'
     } catch (error) {
-      if (disposed || !state.isOpen || id !== requestId) return
+      if (!isCurrentRequest(id)) return
 
       state.error = error
       state.status = 'error'
@@ -129,8 +131,13 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     state.selectedId = state.results[next]!.id
   }
 
-  function activate(): SearchResult | null {
-    return state.isOpen && state.status === 'success' ? selectedResult.value : null
+  function activate(id?: string): SearchResult | null {
+    if (!state.isOpen || state.status !== 'success') return null
+    if (id !== undefined) {
+      if (!state.results.some((result) => result.id === id)) return null
+      select(id)
+    }
+    return selectedResult.value
   }
 
   function retry() {

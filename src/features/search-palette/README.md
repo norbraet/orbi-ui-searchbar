@@ -95,12 +95,19 @@ consumer that loads only the shared token foundation and component styles.
 
 `useSearchPalette({ search, context?, debounceMs? })` exposes readonly `state` and `selectedResult`,
 plus `open`, `close`, `setQuery`, `select`, `moveSelection`, `retry`, `activate`, and `dispose`.
-`context` can be a reactive value or getter. `activate()` returns a result or `null`; it does not close
+`context` can be a reactive value or getter. `activate(id?)` validates and selects a supplied result ID,
+or uses the current selection when omitted. It returns a result or `null`; it does not close
 or navigate, leaving those decisions to the UI integration. Closing resets query and responses.
 
 The composable cancels superseded work and ignores stale responses even if a service ignores its
 abort signal. It cleans up with its Vue effect scope. Call `dispose()` manually if creating it outside
 a scope. It is safe to construct during server rendering; call `open()` on the client when appropriate.
+
+The Vue components own DOM measurements, observers, scrolling, focus, keyboard events, and animation
+lifecycle. Pure height and scroll calculations live in `shared/lib/layout.ts`; preview image URL
+validation lives in `shared/lib/url.ts`. These helpers have no Vue or DOM dependency and can be reused
+by other components. Search requests, result selection, and activation validation stay in the headless
+model, while matching remains behind the mock service boundary.
 
 ## Demo and verification
 

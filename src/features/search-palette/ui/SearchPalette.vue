@@ -86,9 +86,7 @@
   }
 
   function activate(id?: string) {
-    if (id && !state.results.some((result) => result.id === id)) return
-    if (id) palette.select(id)
-    const result = palette.activate()
+    const result = palette.activate(id)
     if (!result) return
     isOpen.value = false
     emit('activate', result)

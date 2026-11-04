@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { computed, ref, useId, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import type { VNode } from 'vue'
+  import { calculatePanelHeight, calculateScrollTop } from '@/shared/lib/layout'
+  import { getPreviewImageUrl } from '@/shared/lib/url'
   import type {
     SearchPaletteLabels,
     SearchResult,
@@ -52,9 +54,7 @@
     // Keep the last settled size while another non-empty query is pending.
     if (hasQuery.value && props.status === 'loading' && bodyHeight.value !== undefined) return
 
-    const paneHeight = (content: HTMLElement) => {
-      const pane = content.parentElement!
-      const style = getComputedStyle(pane)
+    const paneHeight = (content: HTMLElement, style: CSSStyleDeclaration) => {
       return (
         content.scrollHeight +
         parseFloat(style.paddingTop) +
@@ -63,17 +63,21 @@
         parseFloat(style.borderBottomWidth)
       )
     }
-    const resultHeight = paneHeight(results)
-    const previewHeight = previewContent.value ? paneHeight(previewContent.value) : 0
-    const stacked = getComputedStyle(area).flexDirection === 'column'
-    const resultLimit = parseFloat(getComputedStyle(results.parentElement!).maxHeight)
-    const naturalHeight = stacked
-      ? Math.min(resultHeight, Number.isFinite(resultLimit) ? resultLimit : Infinity) +
-        previewHeight
-      : Math.max(resultHeight, previewHeight)
-    const limit = parseFloat(getComputedStyle(area).maxHeight)
-    const target = Math.ceil(Math.min(naturalHeight, Number.isFinite(limit) ? limit : Infinity))
-    if (bodyHeight.value !== target) bodyHeight.value = target
+    const areaStyle = getComputedStyle(area)
+    const resultStyle = getComputedStyle(results.parentElement!)
+    const resultHeight = paneHeight(results, resultStyle)
+    const previewHeight = previewContent.value
+      ? paneHeight(previewContent.value, getComputedStyle(previewContent.value.parentElement!))
+      : 0
+    const resultLimit = parseFloat(resultStyle.maxHeight)
+    const limit = parseFloat(areaStyle.maxHeight)
+    bodyHeight.value = calculatePanelHeight({
+      primaryHeight: resultHeight,
+      secondaryHeight: previewHeight,
+      stacked: areaStyle.flexDirection === 'column',
+      primaryMaxHeight: Number.isFinite(resultLimit) ? resultLimit : undefined,
+      maxHeight: Number.isFinite(limit) ? limit : undefined,
+    })
   }
 
   watch(
@@ -92,10 +96,7 @@
 
   watch(
     () => [props.status, props.query, props.results, props.selectedResult, props.suggestions],
-    async () => {
-      await nextTick()
-      measureContent()
-    },
+    measureContent,
     { flush: 'post' }
   )
 
@@ -125,14 +126,7 @@
   const failedImage = ref<string | null>(null)
   const previewImage = computed(() => {
     const url = props.selectedResult?.preview?.imageUrl
-    if (!url || failedImage.value === url) return undefined
-    try {
-      return ['http:', 'https:'].includes(new URL(url, 'https://preview.invalid').protocol)
-        ? url
-        : undefined
-    } catch {
-      return undefined
-    }
+    return failedImage.value === url ? undefined : getPreviewImageUrl(url)
   })
 
   function applySuggestion(query: string) {
@@ -157,13 +151,14 @@
     const option = activeId.value ? input.value?.ownerDocument.getElementById(activeId.value) : null
     if (!pane || !option || !pane.contains(option)) return
     const style = getComputedStyle(pane)
-    const top = option.offsetTop - parseFloat(style.paddingTop)
-    const bottom = option.offsetTop + option.offsetHeight + parseFloat(style.paddingBottom)
-    if (top < pane.scrollTop || option.offsetHeight > pane.clientHeight) {
-      pane.scrollTop = top
-    } else if (bottom > pane.scrollTop + pane.clientHeight) {
-      pane.scrollTop = bottom - pane.clientHeight
-    }
+    pane.scrollTop = calculateScrollTop({
+      scrollTop: pane.scrollTop,
+      viewportHeight: pane.clientHeight,
+      itemTop: option.offsetTop,
+      itemHeight: option.offsetHeight,
+      paddingTop: parseFloat(style.paddingTop),
+      paddingBottom: parseFloat(style.paddingBottom),
+    })
   }
 
   watch(
@@ -291,37 +286,34 @@
 
     <section v-if="selectedResult" class="search-palette-preview" :aria-label="labels.preview">
       <div ref="previewContent" class="search-palette-preview-inner">
-        <template v-if="selectedResult">
-          <div :key="selectedResult.id" class="search-palette-preview-content">
-            <slot name="preview" :result="selectedResult">
-              <span class="search-palette-eyebrow"
-                >{{ labels.preview }} · {{ selectedResult.kind }}</span
-              >
-              <h3>{{ selectedResult.title }}</h3>
-              <p class="search-palette-location">
-                {{ selectedResult.source }} / {{ selectedResult.location }}
-              </p>
-              <img
-                v-if="previewImage"
-                :src="previewImage"
-                :alt="selectedResult.preview?.imageAlt ?? ''"
-                class="search-palette-thumbnail"
-                @error="failedImage = previewImage ?? null"
-              />
-              <p class="search-palette-preview-text">
-                {{ selectedResult.preview?.text || labels.noPreview }}
-              </p>
-              <p v-if="selectedResult.preview?.updatedAt" class="search-palette-location">
-                {{ labels.updated }} {{ selectedResult.preview.updatedAt }}
-              </p>
-              <p class="search-palette-destination">{{ selectedResult.url }}</p>
-            </slot>
-          </div>
-          <button class="search-palette-action" type="button" @click="emit('activate')">
-            {{ labels.openResult }} <span aria-hidden="true">↗</span>
-          </button>
-        </template>
-        <span v-else class="search-palette-eyebrow">{{ labels.preview }}</span>
+        <div :key="selectedResult.id" class="search-palette-preview-content">
+          <slot name="preview" :result="selectedResult">
+            <span class="search-palette-eyebrow"
+              >{{ labels.preview }} · {{ selectedResult.kind }}</span
+            >
+            <h3>{{ selectedResult.title }}</h3>
+            <p class="search-palette-location">
+              {{ selectedResult.source }} / {{ selectedResult.location }}
+            </p>
+            <img
+              v-if="previewImage"
+              :src="previewImage"
+              :alt="selectedResult.preview?.imageAlt ?? ''"
+              class="search-palette-thumbnail"
+              @error="failedImage = previewImage ?? null"
+            />
+            <p class="search-palette-preview-text">
+              {{ selectedResult.preview?.text || labels.noPreview }}
+            </p>
+            <p v-if="selectedResult.preview?.updatedAt" class="search-palette-location">
+              {{ labels.updated }} {{ selectedResult.preview.updatedAt }}
+            </p>
+            <p class="search-palette-destination">{{ selectedResult.url }}</p>
+          </slot>
+        </div>
+        <button class="search-palette-action" type="button" @click="emit('activate')">
+          {{ labels.openResult }} <span aria-hidden="true">↗</span>
+        </button>
       </div>
     </section>
   </div>

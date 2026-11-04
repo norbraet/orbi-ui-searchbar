@@ -44,6 +44,20 @@ describe('useSearchPalette (without rendering)', () => {
     vi.useRealTimers()
   })
 
+  it('activates only current result IDs without falling back to the selection for unknown IDs', async () => {
+    const model = create(async () => ({ results: [first, second] }))
+    expect(model.activate('b')).toBeNull()
+    model.open()
+    expect(model.activate('b')).toBeNull()
+    await nextTick()
+    expect(model.activate('missing')).toBeNull()
+    expect(model.selectedResult.value?.id).toBe('a')
+    expect(model.activate('b')?.id).toBe('b')
+    expect(model.selectedResult.value?.id).toBe('b')
+    model.close()
+    expect(model.activate('b')).toBeNull()
+  })
+
   it('loads initial suggestions and preserves backend ordering', async () => {
     const search = vi.fn<SearchService>().mockResolvedValue({
       results: [second, first],

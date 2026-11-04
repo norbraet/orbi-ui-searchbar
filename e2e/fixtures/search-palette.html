@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Isolated search palette consumer</title>
+    <link rel="stylesheet" href="/src/app/styles/tokens.css" />
+  </head>
+  <body>
+    <div id="consumer"></div>
+    <script type="module">
+      import { createApp, h, ref } from 'vue'
+      import { SearchPalette } from '/src/features/search-palette/index.ts'
+      // Shared design tokens only; no app reset/base styles, router, Pinia, or i18n.
+      const scenario = new URLSearchParams(location.search).get('scenario')
+      createApp({
+        setup() {
+          const open = ref(false)
+          const mounted = ref(true)
+          const activation = ref('')
+          const calls = ref(0)
+          const search = async ({ signal }) => {
+            calls.value += 1
+            const call = calls.value
+            await new Promise((resolve, reject) => {
+              const timer = setTimeout(resolve, 30)
+              signal.addEventListener(
+                'abort',
+                () => {
+                  clearTimeout(timer)
+                  reject(signal.reason)
+                },
+                { once: true }
+              )
+            })
+            if (scenario === 'error' && call === 1) throw new Error('Offline')
+            return {
+              results:
+                scenario === 'empty'
+                  ? []
+                  : [
+                      {
+                        id: 'one',
+                        title: 'First document',
+                        kind: 'Document',
+                        source: 'Library',
+                        location: 'Guides / Start',
+                        url: '/first',
+                        preview: { text: 'A useful first preview.' },
+                      },
+                      {
+                        id: 'two',
+                        title: 'Second document',
+                        kind: 'Link',
+                        source: 'Library',
+                        location: 'Guides / Next',
+                        url: '/second',
+                        preview:
+                          scenario === 'broken-image'
+                            ? { imageUrl: '/does-not-exist.png' }
+                            : undefined,
+                      },
+                    ],
+              suggestions: [{ id: 's', label: 'Try design', query: 'design' }],
+            }
+          }
+          return () =>
+            h('main', [
+              h('h1', 'Independent Vue consumer'),
+              h('button', { id: 'trigger', onClick: () => (open.value = true) }, 'Open search'),
+              mounted.value
+                ? h(SearchPalette, {
+                    open: open.value,
+                    'onUpdate:open': (value) => (open.value = value),
+                    search,
+                    debounceMs: 10,
+                    onActivate: (result) => (activation.value = result.url),
+                  })
+                : null,
+              h('output', { id: 'activation' }, activation.value),
+              h('output', { id: 'calls' }, String(calls.value)),
+              h(
+                'button',
+                { id: 'unmount', onClick: () => (mounted.value = false) },
+                'Unmount palette'
+              ),
+            ])
+        },
+      }).mount('#consumer')
+    </script>
+  </body>
+</html>

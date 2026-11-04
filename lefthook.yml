@@ -8,12 +8,7 @@ pre-commit:
       skip_empty: true
 
     forbidden-branches:
-      run: |
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
-          echo "❌ Direct commits to $BRANCH branch are forbidden!"
-          exit 1
-        fi
+      run: node scripts/check-branch.mjs
 
     eslint:
       glob: '*.{js,mjs,ts,vue}'
@@ -38,12 +33,7 @@ commit-msg:
 pre-push:
   commands:
     forbidden-branches:
-      run: |
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
-          echo "❌ Pushing to $BRANCH branch is forbidden!"
-          exit 1
-        fi
+      run: node scripts/check-branch.mjs
 
     typecheck:
       run: pnpm typecheck

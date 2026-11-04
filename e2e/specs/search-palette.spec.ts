@@ -299,6 +299,24 @@ test('broken preview images fall back and layout fits a small viewport', async (
   )
 })
 
+test('long preview content reflows on narrow screens and with enlarged text', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto(`${consumer}?scenario=long-content`)
+  await page.getByRole('button', { name: 'Open search' }).click()
+  await page.getByRole('combobox').fill('document')
+  await expect(page.getByRole('option')).toHaveCount(2)
+  const preview = page.locator('.search-palette-preview')
+  for (const fontSize of ['16px', '32px']) {
+    await page.locator('html').evaluate((root, size) => {
+      root.style.fontSize = size
+    }, fontSize)
+    await expect.poll(() => preview.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+    await page.getByRole('button', { name: 'Open result', exact: true }).scrollIntoViewIfNeeded()
+    await expect(page.getByRole('button', { name: 'Open result', exact: true })).toBeInViewport()
+  }
+})
+
 test('accessible modal semantics in the isolated consumer', async ({ page }) => {
   await page.goto(consumer)
   await page.getByRole('button', { name: 'Open search' }).click()

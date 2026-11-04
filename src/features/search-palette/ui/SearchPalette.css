@@ -182,6 +182,7 @@
   padding: var(--space-component-xl);
   border-left: var(--border-width-thin) solid var(--color-border);
   overflow: auto;
+  overflow-wrap: anywhere;
 }
 
 .search-palette-preview-inner > * + * {

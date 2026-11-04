@@ -44,12 +44,20 @@
                   : [
                       {
                         id: 'one',
-                        title: 'First document',
+                        title:
+                          scenario === 'long-content'
+                            ? 'ExtremelyLongUnbrokenDocumentName'.repeat(8)
+                            : 'First document',
                         kind: 'Document',
                         source: 'Library',
                         location: 'Guides / Start',
                         url: '/first',
-                        preview: { text: 'A useful first preview.' },
+                        preview: {
+                          text:
+                            scenario === 'long-content'
+                              ? 'UnbrokenPreviewContent'.repeat(20)
+                              : 'A useful first preview.',
+                        },
                       },
                       {
                         id: 'two',

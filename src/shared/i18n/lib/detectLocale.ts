@@ -8,7 +8,7 @@ function getBrowserLocale(): Locale | null {
   }
 
   const normalized = navigator.language.toLowerCase()
-  const primary = normalized.split('-')[0]
+  const primary = normalized.split('-')[0] ?? ''
 
   if (isLocale(normalized)) {
     return normalized

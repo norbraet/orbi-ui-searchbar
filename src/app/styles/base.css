@@ -71,16 +71,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :root,
-    [data-theme] {
-      --motion-duration-instant: 0ms;
-      --motion-duration-fast: 0ms;
-      --motion-duration-normal: 0ms;
-      --motion-duration-moderate: 0ms;
-      --motion-duration-slow: 0ms;
-      --motion-duration-slower: 0ms;
-    }
-
     *,
     *::before,
     *::after {

@@ -1,0 +1,22 @@
+/* Shared library foundation: tokens and themes, without reset or app base styles. */
+@layer primitives, semantics, themes;
+
+@import url('./primitives/colors.css');
+@import url('./primitives/motion.css');
+@import url('./primitives/materials.css');
+@import url('./primitives/radius.css');
+@import url('./primitives/shadows.css');
+@import url('./primitives/spacing.css');
+@import url('./primitives/typography.css');
+@import url('./primitives/z-index.css');
+@import url('./semantics/colors.semantics.css');
+@import url('./semantics/materials.semantics.css');
+@import url('./semantics/layout.semantics.css');
+@import url('./semantics/borders.semantics.css');
+@import url('./semantics/shadows.semantics.css');
+@import url('./semantics/radius.semantics.css');
+@import url('./semantics/motion.semantics.css');
+@import url('./semantics/typography.semantics.css');
+@import url('./themes/light.css');
+@import url('./themes/dark.css');
+@import url('./themes/accessibility.css');

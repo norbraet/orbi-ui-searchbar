@@ -7,10 +7,18 @@ spacing, and motion values here are project choices, not an Apple CSS specificat
 
 ## Layers and roles
 
+- `tokens.css` is the shared library foundation: import it once for tokens, themes, and accessibility
+  preferences without the app reset or base styles. `global.css` composes this entry with the app styles.
 - `primitives/` holds reusable scales and raw values.
 - `semantics/` names roles that components consume.
 - `themes/` supplies light and dark appearances and accessibility overrides.
 - `base.css` applies typography, focus, and motion preferences globally.
+
+Components consume semantic roles directly instead of duplicating them behind feature-specific
+fallback tokens. Extend the shared semantics for reusable gaps; keep component dimensions and
+proportions in local layout rules. `--radius-control` covers compact controls, while `--radius-button`
+is available for prominent capsule actions. The motion roles include `--motion-pulse`, small/medium
+distances, and an entrance scale for reusable feedback and overlay effects.
 
 Use `--color-surface` and related opaque surface roles for content. Use glass sparingly for floating
 controls and navigation, including the search palette shell. Avoid stacking translucent surfaces on

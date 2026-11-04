@@ -14,6 +14,8 @@ direction; it is not a fixed backlog or a commitment to a particular design or i
 - Support different kinds of content through a consistent search experience.
 - Explore useful interactions that go beyond a list of links while keeping the interface focused.
 - Build a frontend component that can later connect to a real search backend.
+- Make the component reusable across the maintainer's Vue projects as part of their own Vue component
+  library, with a public API independent of this demo application's providers.
 
 ## Intended capabilities
 
@@ -29,7 +31,8 @@ as we build:
   metadata, or supplied thumbnails, with a useful fallback when a preview is unavailable.
 - **Open and act:** Open the provided destination from a result. Supporting actions, such as copying
   a link or opening a new tab, can be added where useful.
-- **Guide discovery:** Offer suggestions and useful starting points, such as recent or pinned items.
+- **Guide discovery:** Show query suggestions before typing; searchable context items appear only
+  after a non-empty query.
 - **Refine searches:** Allow users to narrow the search by source, content type, or another meaningful
   scope without making the interface cumbersome.
 - **Handle real conditions:** Provide clear loading, empty, error, and unavailable-content states.
@@ -57,10 +60,11 @@ The frontend owns presentation and interaction: query input, selection, scope co
 display, navigation, and local interface state.
 
 A replaceable mocked service supplies search responses, including ordered results, suggestions,
-preview content, and any relevance explanations or relationships. We are not implementing indexing,
-ranking, or a search algorithm in the frontend. Fixtures should provide predictable scenarios for
-developing and validating the component, including delays, failures, and responses arriving out of
-order.
+preview content, and any relevance explanations or relationships. The reusable component does not
+implement indexing, matching, or ranking. For realistic exploration, the demo mock service performs
+simple matching over a fixed fixture catalog; production search algorithms remain outside scope.
+Fixtures should provide predictable scenarios for developing and validating the component, including
+delays, failures, and responses arriving out of order.
 
 Website previews use supplied metadata and thumbnail assets in this project. Generating screenshots,
 fetching arbitrary pages, and guaranteeing live embedded previews are outside the current scope.
@@ -87,6 +91,9 @@ responses. Use the existing Storybook and testing tools where they help demonstr
 behaviors.
 
 ## Decisions and evolving scope
+
+The [search palette implementation plan](search-palette-plan.md) describes the proposed delivery steps
+and separation between behavior, presentation, and the mocked search service.
 
 Update this document as the product direction changes. Keep detailed delivery tasks and implementation
 choices out of this overview.

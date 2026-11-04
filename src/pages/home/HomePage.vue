@@ -3,9 +3,30 @@
   import { useThemeStore } from '@/features/theme/model/useThemeStore'
   import { THEME_OPTIONS } from '@/features/theme/config'
   import { BaseButton } from '@/shared/components/BaseButton'
+  import { computed, ref } from 'vue'
+  import {
+    SearchPalette,
+    searchPaletteLabels,
+    searchPaletteLabelsDe,
+  } from '@/features/search-palette'
+  import type { SearchResult } from '@/features/search-palette'
+  import { createMockSearchService, type MockScenario } from '@/features/search-palette/mocks'
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const appStore = useThemeStore()
+  const searchOpen = ref(false)
+  const scenario = ref<MockScenario>('default')
+  const search = computed(() => createMockSearchService(scenario.value))
+  const searchLabels = computed(() =>
+    locale.value === 'de' ? searchPaletteLabelsDe : searchPaletteLabels
+  )
+
+  function openSearchResult(result: SearchResult) {
+    const url = new URL(result.url, window.location.origin)
+    if (url.protocol === 'https:' || url.protocol === 'http:') {
+      window.open(url.href, '_blank', 'noopener,noreferrer')
+    }
+  }
 
   const getThemeLabel = (theme: string) => t(`theme.options.${theme}`)
 
@@ -104,6 +125,34 @@
 
 <template>
   <div class="container">
+    <section class="search-demo" :aria-label="t('home.searchDemo.title')">
+      <div>
+        <h2>{{ t('home.searchDemo.title') }}</h2>
+        <p>{{ t('home.searchDemo.description') }}</p>
+      </div>
+      <div class="search-demo-actions">
+        <BaseButton @click="searchOpen = true"
+          >{{ t('home.searchDemo.open') }} <kbd>⌘ / Ctrl + K</kbd></BaseButton
+        >
+        <label class="search-demo-scenario" for="search-demo-scenario">
+          {{ t('home.searchDemo.scenario') }}
+          <select id="search-demo-scenario" v-model="scenario">
+            <option value="default">{{ t('home.searchDemo.default') }}</option>
+            <option value="empty">{{ t('home.searchDemo.empty') }}</option>
+            <option value="error">{{ t('home.searchDemo.error') }}</option>
+            <option value="slow">{{ t('home.searchDemo.slow') }}</option>
+            <option value="no-preview">{{ t('home.searchDemo.noPreview') }}</option>
+          </select>
+        </label>
+      </div>
+    </section>
+    <SearchPalette
+      v-model:open="searchOpen"
+      :search="search"
+      :labels="searchLabels"
+      :context="{ workspace: 'demo' }"
+      @activate="openSearchResult"
+    />
     <section class="hero">
       <h1>{{ t('home.title') }}</h1>
       <p>{{ t('home.subtitle') }}</p>
@@ -133,6 +182,42 @@
 </template>
 
 <style lang="css" scoped>
+  .search-demo {
+    display: grid;
+    gap: var(--space-component-xl);
+    padding: var(--space-component-xl);
+    border: var(--border-width-thin) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+
+  .search-demo h2 {
+    margin-bottom: var(--space-component-xs);
+  }
+
+  .search-demo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-component-sm);
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .search-demo-scenario {
+    display: flex;
+    align-items: center;
+    gap: var(--space-component-xs);
+  }
+
+  .search-demo select {
+    font: inherit;
+    color: var(--color-text);
+    background: var(--color-surface);
+    padding: var(--space-component-xs);
+    border: var(--border-width-thin) solid var(--color-border);
+    border-radius: var(--radius-tag);
+  }
+
   .hero {
     text-align: center;
     /* stylelint-disable-next-line plugin/no-hardcoded-spacing */

@@ -9,7 +9,7 @@ import { i18n } from '@/app/providers/i18n'
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     }
@@ -40,7 +40,7 @@ function applyDocumentTitle(route: RouteLocationNormalizedLoaded): void {
 }
 
 // Global navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   applyDocumentTitle(to)
 
   next()

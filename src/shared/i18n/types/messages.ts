@@ -12,6 +12,17 @@ export interface MessageSchema {
     subtitle: string
     viewGuide: string
     stackTitle: string
+    searchDemo: {
+      title: string
+      description: string
+      open: string
+      scenario: string
+      default: string
+      empty: string
+      error: string
+      slow: string
+      noPreview: string
+    }
     meta: {
       title: string
     }

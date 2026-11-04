@@ -2,8 +2,8 @@
   box-sizing: border-box;
   width: min(54rem, calc(100% - var(--space-component-md) * 2));
   max-width: none;
-  max-height: calc(100dvh - var(--space-component-md) * 2);
-  margin: auto;
+  max-height: calc(80dvh - var(--space-component-md));
+  margin: 20dvh auto auto;
   padding: 0;
   overflow: auto;
   border: var(--border-width-thin) solid var(--material-border);
@@ -16,6 +16,11 @@
   box-shadow: var(--material-shadow);
   backdrop-filter: var(--material-regular-filter);
   -webkit-backdrop-filter: var(--material-regular-filter);
+}
+
+.search-palette[open] {
+  display: flex;
+  flex-direction: column;
 }
 
 .search-palette::backdrop {
@@ -67,6 +72,7 @@
 
 .search-palette-header {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-component-sm);
   padding: var(--space-component-md) var(--space-component-xl);
@@ -108,15 +114,17 @@
 
 .search-palette-body {
   display: flex;
-  height: min(30rem, 65dvh);
-  min-height: min(24rem, 55dvh);
-  max-height: min(38rem, 65dvh);
-  overflow: auto;
+  min-height: 0;
+  max-height: min(30rem, 65dvh);
+  overflow: hidden;
+  transition: height var(--motion-normal) var(--motion-ease-standard);
 }
 
 .search-palette-results {
+  position: relative;
   flex: 1;
   min-width: 0;
+  min-height: 0;
   padding: var(--space-component-xs);
   overflow: auto;
 }
@@ -176,7 +184,7 @@
   overflow: auto;
 }
 
-.search-palette-preview > * + * {
+.search-palette-preview-inner > * + * {
   margin-top: var(--space-component-md);
 }
 
@@ -253,6 +261,7 @@
 
 .search-palette-footer {
   display: flex;
+  flex-shrink: 0;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: var(--space-component-xs);
@@ -353,9 +362,14 @@
 }
 
 @media (max-width: 600px) {
+  .search-palette {
+    max-height: calc(100dvh - min(var(--space-section), 8dvh) - var(--space-component-md));
+    margin-top: min(var(--space-section), 8dvh);
+  }
+
   .search-palette-body {
     flex-direction: column;
-    max-height: 65dvh;
+    overflow: auto;
   }
 
   .search-palette-results {

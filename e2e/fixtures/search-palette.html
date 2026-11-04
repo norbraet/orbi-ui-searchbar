@@ -19,9 +19,9 @@
           const mounted = ref(true)
           const activation = ref('')
           const calls = ref(0)
-          const search = async ({ signal }) => {
+          let hasFailed = false
+          const search = async ({ query, signal }) => {
             calls.value += 1
-            const call = calls.value
             await new Promise((resolve, reject) => {
               const timer = setTimeout(resolve, 30)
               signal.addEventListener(
@@ -33,7 +33,10 @@
                 { once: true }
               )
             })
-            if (scenario === 'error' && call === 1) throw new Error('Offline')
+            if (scenario === 'error' && query.trim() && !hasFailed) {
+              hasFailed = true
+              throw new Error('Offline')
+            }
             return {
               results:
                 scenario === 'empty'

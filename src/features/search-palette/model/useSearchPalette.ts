@@ -46,19 +46,21 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
 
     const activeController = new AbortController()
     controller = activeController
+    const query = state.query.trim()
 
     try {
       const response = await options.search({
-        query: state.query.trim(),
+        query,
         context: toValue(options.context),
         signal: activeController.signal,
       })
 
       if (disposed || !state.isOpen || id !== requestId) return
 
-      state.results = response.results
+      // Empty input is a suggestions-only state, even if a provider returns items.
+      state.results = query ? response.results : []
       state.suggestions = response.suggestions ?? []
-      state.selectedId = response.results[0]?.id ?? null
+      state.selectedId = state.results[0]?.id ?? null
       state.status = 'success'
     } catch (error) {
       if (disposed || !state.isOpen || id !== requestId) return
@@ -105,7 +107,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     if (disposed || query === state.query) return
 
     state.query = query
-    schedule()
+    schedule(!query.trim())
   }
 
   function select(id: string) {

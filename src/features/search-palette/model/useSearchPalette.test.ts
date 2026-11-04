@@ -27,8 +27,13 @@ describe('useSearchPalette (without rendering)', () => {
   let scope = effectScope()
   const create = (
     search: SearchService,
-    context?: ReturnType<typeof ref<Record<string, unknown>>>
-  ) => scope.run(() => useSearchPalette({ search, context, debounceMs: 100 }))!
+    context?: ReturnType<typeof ref<Record<string, unknown>>>,
+    query = 'example'
+  ) => {
+    const model = scope.run(() => useSearchPalette({ search, context, debounceMs: 100 }))!
+    model.setQuery(query)
+    return model
+  }
 
   beforeEach(() => {
     scope = effectScope()
@@ -49,9 +54,45 @@ describe('useSearchPalette (without rendering)', () => {
     expect(model.activate()).toBeNull()
     model.open()
     await nextTick()
-    expect(search.mock.calls[0]![0].query).toBe('')
+    expect(search.mock.calls[0]![0].query).toBe('example')
     expect(model.state.results.map((x) => x.id)).toEqual(['b', 'a'])
     expect(model.selectedResult.value?.id).toBe('b')
+    expect(model.state.suggestions[0]?.query).toBe('alpha')
+  })
+
+  it.each(['', '  \t  '])(
+    'ignores provider results for blank input %j while keeping suggestions',
+    async (query) => {
+      const model = create(
+        async () => ({
+          results: [first],
+          suggestions: [{ id: 's', label: 'Try Alpha', query: 'alpha' }],
+        }),
+        undefined,
+        query
+      )
+      model.open()
+      await nextTick()
+      expect(model.state.status).toBe('success')
+      expect(model.state.results).toEqual([])
+      expect(model.state.suggestions[0]?.query).toBe('alpha')
+      expect(model.selectedResult.value).toBeNull()
+      expect(model.activate()).toBeNull()
+    }
+  )
+
+  it('clearing the query removes results and restores suggestions immediately without a debounce', async () => {
+    const model = create(async () => ({
+      results: [first],
+      suggestions: [{ id: 's', label: 'Try Alpha', query: 'alpha' }],
+    }))
+    model.open()
+    await nextTick()
+    expect(model.activate()?.id).toBe('a')
+    model.setQuery(' ')
+    expect(model.activate()).toBeNull()
+    await nextTick()
+    expect(model.state.results).toEqual([])
     expect(model.state.suggestions[0]?.query).toBe('alpha')
   })
 
@@ -171,6 +212,9 @@ describe('useSearchPalette (without rendering)', () => {
     old.resolve({ results: [first] })
     await nextTick()
     expect(model.state.query).toBe('')
+    expect(model.activate()).toBeNull()
+    model.setQuery('second')
+    await vi.advanceTimersByTimeAsync(100)
     expect(model.activate()?.id).toBe('b')
   })
 

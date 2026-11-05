@@ -1,7 +1,26 @@
-import type { SearchResult, SearchService, SearchSuggestion } from '@/features/search-palette/types'
+import type {
+  SearchResult,
+  SearchScope,
+  SearchService,
+  SearchSuggestion,
+} from '@/features/search-palette/types'
 import { mockSearchResults } from '@/features/search-palette/mocks/fixtures'
 
 export type MockScenario = 'default' | 'empty' | 'error' | 'slow' | 'no-preview'
+
+const scopeDefinitions = [
+  { id: 'documents', label: 'Documents', kind: 'Document' },
+  { id: 'decisions', label: 'Decisions', kind: 'Decision' },
+  { id: 'links', label: 'Links', kind: 'Link' },
+  { id: 'issues', label: 'Issues', kind: 'Issue' },
+  { id: 'notes', label: 'Notes', kind: 'Note' },
+  { id: 'design-files', label: 'Design files', kind: 'Design file' },
+]
+
+export const mockSearchScopes: readonly SearchScope[] = scopeDefinitions.map(({ id, label }) => ({
+  id,
+  label,
+}))
 
 const suggestions: SearchSuggestion[] = [
   { id: 'suggest-decision', label: 'Architecture decisions', query: 'decision' },
@@ -31,7 +50,7 @@ function searchableText(result: SearchResult): string {
 
 /** Demo-only fixture matching behind the service boundary; no production index or ranking. */
 export function createMockSearchService(scenario: MockScenario = 'default'): SearchService {
-  return ({ query, signal }) =>
+  return ({ query, scopeId, signal }) =>
     new Promise((resolve, reject) => {
       if (signal.aborted) {
         reject(signal.reason)
@@ -53,25 +72,42 @@ export function createMockSearchService(scenario: MockScenario = 'default'): Sea
             const normalized = normalize(text)
             return terms.every((term) => normalized.includes(term))
           }
-          const results =
+          const matchingResults =
             scenario === 'empty' || !terms.length
               ? []
               : mockSearchResults.filter((result) => matches(searchableText(result)))
+          const scopeKind = scopeDefinitions.find((scope) => scope.id === scopeId)?.kind
+          const inScope = (result: SearchResult) =>
+            scopeId === undefined || result.kind === scopeKind
+          const results = matchingResults.filter(inScope)
+          const candidates = mockSearchResults.filter(inScope)
+          const scopedSuggestions = suggestions.filter((suggestion) => {
+            const term = normalize(suggestion.query)
+            return candidates.some((result) => normalize(searchableText(result)).includes(term))
+          })
           const relatedSuggestions = terms.length
-            ? suggestions.filter(
+            ? scopedSuggestions.filter(
                 (suggestion) =>
                   normalize(suggestion.query) !== terms.join(' ') &&
                   matches(suggestion.label + ' ' + suggestion.query)
               )
-            : suggestions
+            : scopedSuggestions
           resolve({
+            scopeCounts: terms.length
+              ? Object.fromEntries(
+                  scopeDefinitions.map((scope) => [
+                    scope.id,
+                    matchingResults.filter((result) => result.kind === scope.kind).length,
+                  ])
+                )
+              : undefined,
             results: results.map(({ preview, ...result }) =>
               preview && scenario !== 'no-preview' ? { ...result, preview: { ...preview } } : result
             ),
             // Recovery suggestions are separate from results; never substitute unrelated matches.
             suggestions: (results.length || relatedSuggestions.length
               ? relatedSuggestions
-              : suggestions.slice(0, 4)
+              : scopedSuggestions.slice(0, 4)
             ).map((suggestion) => ({ ...suggestion })),
           })
         },

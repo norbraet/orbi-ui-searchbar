@@ -3,9 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMockSearchService, type MockScenario } from './index'
 import { mockSearchResults } from './fixtures'
 
-async function search(query: string, scenario: MockScenario = 'default') {
+async function search(query: string, scenario: MockScenario = 'default', scopeId?: string) {
   const response = createMockSearchService(scenario)({
     query,
+    scopeId,
     signal: new AbortController().signal,
   })
   await vi.runAllTimersAsync()
@@ -15,6 +16,43 @@ async function search(query: string, scenario: MockScenario = 'default') {
 describe('mock search backend', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
+
+  it('narrows matches on the backend and returns counts independent of the selected scope', async () => {
+    const all = await search('design')
+    const documents = await search('design', 'default', 'documents')
+    const decisions = await search('design', 'default', 'decisions')
+    expect(documents.results).toEqual(all.results.filter((result) => result.kind === 'Document'))
+    expect(decisions.results).toEqual(all.results.filter((result) => result.kind === 'Decision'))
+    expect(documents.scopeCounts).toEqual(decisions.scopeCounts)
+    expect(documents.scopeCounts?.documents).toBe(documents.results.length)
+    expect(documents.scopeCounts?.decisions).toBe(decisions.results.length)
+    expect(documents.scopeCounts?.documents).toBeGreaterThan(0)
+  })
+
+  it('includes zero counts and offers working suggestions within a scope', async () => {
+    const response = await search('release checklist', 'default', 'links')
+    expect(response.results).toEqual([])
+    expect(response.scopeCounts).toMatchObject({ documents: 1, links: 0 })
+    expect(response.suggestions!.length).toBeGreaterThan(0)
+    for (const suggestion of response.suggestions ?? []) {
+      const matches = await search(suggestion.query, 'default', 'links')
+      expect(matches.results.length).toBeGreaterThan(0)
+      expect(matches.results.every((result) => result.kind === 'Link')).toBe(true)
+    }
+    expect((await search('', 'default', 'links')).scopeCounts).toBeUndefined()
+    expect((await search('', 'default', 'links')).results).toEqual([])
+  })
+
+  it('keeps unknown scopes empty and the missing-preview scenario compatible with scopes', async () => {
+    expect((await search('design', 'default', 'unknown')).results).toEqual([])
+    const normal = await search('design', 'default', 'links')
+    const missing = await search('design', 'no-preview', 'links')
+    expect(missing.results.map((result) => result.id)).toEqual(
+      normal.results.map((result) => result.id)
+    )
+    expect(missing.results.every((result) => !result.preview)).toBe(true)
+    expect(missing.scopeCounts).toEqual(normal.scopeCounts)
+  })
 
   it('provides a diverse catalog with stable unique result IDs', () => {
     expect(mockSearchResults.length).toBeGreaterThanOrEqual(30)

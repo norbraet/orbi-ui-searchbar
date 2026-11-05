@@ -80,7 +80,9 @@
 }
 
 .search-palette-magnifier {
-  font-size: var(--text-title-size);
+  flex-shrink: 0;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
   color: var(--color-text-muted);
 }
 

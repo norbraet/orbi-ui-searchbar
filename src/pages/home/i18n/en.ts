@@ -14,6 +14,14 @@ const home = {
     error: 'Service unavailable',
     slow: 'Slow response',
     noPreview: 'Missing preview',
+    scopes: {
+      documents: 'Documents',
+      decisions: 'Decisions',
+      links: 'Links',
+      issues: 'Issues',
+      notes: 'Notes',
+      'design-files': 'Design files',
+    },
   },
   meta: {
     title: 'Home',

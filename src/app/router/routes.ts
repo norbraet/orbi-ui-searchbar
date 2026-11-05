@@ -10,14 +10,6 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/guide',
-    name: 'guide',
-    component: () => import('@/pages/guide/GuidePage.vue'),
-    meta: {
-      titleKey: 'guide.meta.title',
-    },
-  },
-  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/pages/not-found/NotFoundPage.vue'),

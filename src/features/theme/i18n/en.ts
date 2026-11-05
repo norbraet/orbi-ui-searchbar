@@ -2,9 +2,9 @@ const theme = {
   currentLabel: 'Theme: {theme}',
   switchedTo: 'Switched to {theme} theme',
   options: {
-    light: 'light',
-    dark: 'dark',
-    system: 'system',
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
   },
 } as const
 

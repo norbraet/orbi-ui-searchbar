@@ -1,10 +1,11 @@
 const notFound = {
   title: 'Page Not Found',
-  description: "The page you're looking for doesn't exist or has been moved.",
-  goHome: 'Go Home',
+  description:
+    'There is nothing at this address. Head back to the playground to try another search.',
+  goHome: 'Back to playground',
   goBack: 'Go Back',
   meta: {
-    title: 'Page Not Found',
+    title: 'Page not found · Orbi Search',
   },
 } as const
 

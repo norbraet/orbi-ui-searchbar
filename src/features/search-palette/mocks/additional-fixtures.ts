@@ -252,7 +252,7 @@ export const additionalFixtures: SearchResult[] = seeds.map((seed) => ({
   source: seed.source ?? 'Workspace',
   location: seed.location,
   excerpt: seed.excerpt,
-  url: `/guide?item=${seed.id}`,
+  url: `https://example.com/?item=${seed.id}`,
   ...(seed.text
     ? { preview: { text: `${seed.title}\n\n${seed.text}`, updatedAt: '2026-11-04' } }
     : {}),

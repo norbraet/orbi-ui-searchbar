@@ -1,15 +1,11 @@
 const home = {
-  title: 'Vue-3- + TypeScript-Vorlage',
-  subtitle:
-    'Ein minimalistischer, klar definierter Startpunkt fuer Vue-3-Projekte mit Feature Sliced Design.',
-  viewGuide: 'Anleitung ansehen',
-  stackTitle: 'Enthaltene Tools',
+  title: 'Suchleisten-Komponente',
+  description: 'Eine Vue-Suchkomponente mit Beispieldaten.',
   searchDemo: {
-    title: 'Finde deinen nächsten Gedanken.',
-    description:
-      'Suche nach „decision“, „design“, „tokens“ oder „deployment“, oder wähle ein Szenario für leere Ergebnisse und Fehlerzustände.',
     open: 'Arbeitsbereich durchsuchen',
-    scenario: 'Demo-Szenario',
+    hint: 'Probiere „decision“, „design“, „tokens“ oder „canary“.',
+    catalog: '{count} Beispielinhalte · {scopes} Bereiche',
+    scenario: 'Szenario',
     default: 'Ergebnisse und Vorschläge',
     empty: 'Keine Ergebnisse',
     error: 'Dienst nicht verfügbar',
@@ -24,9 +20,7 @@ const home = {
       'design-files': 'Designdateien',
     },
   },
-  meta: {
-    title: 'Startseite',
-  },
+  meta: { title: 'Suchleisten-Komponente · Orbi Search' },
 } as const
 
 export default home

@@ -4,7 +4,7 @@ import { useThemeStore } from '@/features/theme/model/useThemeStore'
 import HomePage from './HomePage.vue'
 
 const meta = {
-  title: 'Pages/HomePage',
+  title: 'Pages/Playground',
   component: HomePage,
   tags: ['autodocs'],
   parameters: {

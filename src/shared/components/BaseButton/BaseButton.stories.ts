@@ -51,11 +51,11 @@ export const DisabledSecondary: Story = {
 export const AsLink: Story = {
   render: () => ({
     components: { BaseButton },
-    template: '<BaseButton variant="primary" to="/guide">View guide</BaseButton>',
+    template: '<BaseButton variant="primary" to="/">Home</BaseButton>',
   }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    expect(canvas.getByRole('link', { name: 'View guide' })).toBeInTheDocument()
+    expect(canvas.getByRole('link', { name: 'Home' })).toBeInTheDocument()
   },
 }
 
@@ -88,7 +88,7 @@ export const AllVariants: Story = {
         <BaseButton variant="secondary">Secondary</BaseButton>
         <BaseButton variant="primary" :disabled="true">Disabled primary</BaseButton>
         <BaseButton variant="secondary" :disabled="true">Disabled secondary</BaseButton>
-        <BaseButton variant="primary" to="/guide">Link (primary)</BaseButton>
+        <BaseButton variant="primary" to="/">Link (primary)</BaseButton>
       </div>
     `,
   }),

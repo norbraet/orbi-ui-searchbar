@@ -1,161 +1,112 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue'
   import { useI18n } from 'vue-i18n'
   import NotificationToast from '@/features/notifications/NotificationToast.vue'
+  import ThemeSelector from '@/features/theme/ui/ThemeSelector.vue'
   import LanguageSelector from '@/features/language-selector/ui/LanguageSelector.vue'
-  import { useThemeStore } from '@/features/theme/model/useThemeStore'
 
   const { t } = useI18n()
-  const appStore = useThemeStore()
-
-  onMounted(() => {
-    appStore.initializeTheme()
-  })
 </script>
 
 <template>
-  <div id="app">
-    <header>
-      <nav class="main-header">
-        <router-link to="/" class="logo">{{ t('common.appName') }}</router-link>
-
+  <div class="app-shell">
+    <a class="skip-link" href="#main-content">{{ t('common.skipToContent') }}</a>
+    <header class="site-header">
+      <div class="main-header">
+        <router-link to="/" class="logo">
+          <img src="/orbi.svg" width="28" height="28" alt="" />
+          <span>{{ t('common.appName') }}</span>
+        </router-link>
         <div class="header-actions">
-          <div class="nav-links">
-            <router-link to="/" class="nav-link">{{ t('nav.home') }}</router-link>
-            <router-link to="/guide" class="nav-link">{{ t('nav.guide') }}</router-link>
-          </div>
-
+          <ThemeSelector />
           <LanguageSelector />
         </div>
-      </nav>
+      </div>
     </header>
-
-    <main>
+    <main id="main-content" tabindex="-1">
       <router-view />
     </main>
-
-    <footer>
-      <p>{{ t('common.footerStack') }}</p>
-    </footer>
   </div>
-
   <NotificationToast />
 </template>
 
-<style lang="css" scoped>
-  #app {
+<style scoped>
+  .app-shell {
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100vh;
+    grid-template-rows: auto 1fr;
     min-height: 100dvh;
   }
 
-  header {
+  main,
+  .site-header {
+    transition: var(--motion-transition-colors);
+    transition-property: background-color, border-color;
+    min-width: 0;
+  }
+
+  .site-header {
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    background: var(--color-surface);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border-bottom: var(--border-width-thin) solid var(--color-border);
+    background: var(--material-regular-background);
+    backdrop-filter: var(--material-regular-filter);
+    -webkit-backdrop-filter: var(--material-regular-filter);
   }
 
   .main-header {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--space-component-sm);
     max-width: var(--layout-max-width);
+    min-height: 4.5rem;
     margin: 0 auto;
-    padding: 0 var(--space-page);
-    height: 3.5rem;
-    gap: var(--space-component-md);
+    padding: var(--space-component-sm) var(--space-page);
   }
 
   .logo {
-    font-size: var(--text-prose-size);
-    font-weight: var(--text-display-weight);
-    letter-spacing: var(--text-spacing-ui);
-    text-decoration: none;
+    transition: var(--motion-transition-colors);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-component-xs);
     color: var(--color-text);
-    transition: opacity var(--motion-fast) var(--motion-ease-standard);
-    flex-shrink: 0;
-  }
-
-  .logo:hover {
-    opacity: 0.75;
+    font-weight: var(--text-label-weight);
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .header-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-component-sm);
+    gap: var(--space-component-xs);
   }
 
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: var(--space-component-nano);
-  }
-
-  .nav-link {
-    color: var(--color-text-muted);
-    text-decoration: none;
-    font-weight: var(--text-emphasis-weight);
-    font-size: var(--text-small-size);
-    padding: var(--space-component-xs) var(--space-component-sm);
-    border-radius: var(--radius-button);
-    transition:
-      color var(--motion-fast) var(--motion-ease-standard),
-      background-color var(--motion-fast) var(--motion-ease-standard);
-  }
-
-  .nav-link:hover {
+  .skip-link {
+    transition: var(--motion-transition-colors);
+    position: fixed;
+    top: var(--space-component-xs);
+    left: var(--space-component-xs);
+    z-index: var(--z-modal);
+    padding: var(--space-component-sm);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
     color: var(--color-text);
-    background-color: var(--color-bg-subtle);
+    transform: translateY(-200%);
   }
 
-  .nav-link.router-link-active {
-    color: var(--color-primary);
-    background-color: var(--color-primary-subtle);
-    font-weight: var(--text-label-weight);
+  .skip-link:focus {
+    transform: translateY(0);
   }
 
-  main {
-    padding: var(--space-section) 0;
-  }
-
-  footer {
-    border-top: var(--border-width-thin) solid var(--color-border);
-    background-color: var(--color-surface-raised);
-  }
-
-  footer p {
-    max-width: var(--layout-max-width);
-    margin: 0 auto;
-    padding: var(--space-component-md) var(--space-component-lg);
-    color: var(--color-text);
-    font-size: var(--text-caption-size);
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
+  @media (max-width: 700px) {
     .main-header {
-      padding: 0 var(--space-component-md);
-      height: auto;
-      min-height: 3.5rem;
-      flex-wrap: wrap;
-      padding-top: var(--space-component-xs);
-      padding-bottom: var(--space-component-xs);
+      padding-inline: var(--space-component-md);
     }
 
     .header-actions {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .nav-link {
-      padding: var(--space-component-nano) var(--space-component-xs);
-      font-size: var(--text-caption-size);
+      gap: var(--space-component-nano);
     }
   }
 </style>

@@ -8,12 +8,25 @@
     font-weight: var(--text-body-weight);
     line-height: var(--text-body-line-height);
     letter-spacing: var(--text-body-letter-spacing);
+    transition: var(--motion-transition-colors);
+    transition-property: background-color, border-color;
     background-color: var(--color-bg);
     color: var(--color-text);
   }
 
   p {
+    transition: var(--motion-transition-colors);
     color: var(--color-text-muted);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-text);
+    transition: var(--motion-transition-colors);
   }
 
   h1 {
@@ -61,13 +74,6 @@
     max-width: var(--layout-max-width);
     margin: 0 auto;
     padding: 0 var(--space-page);
-  }
-
-  .theme-transition * {
-    transition:
-      background-color var(--motion-normal) var(--motion-ease-standard),
-      color var(--motion-normal) var(--motion-ease-standard),
-      border-color var(--motion-fast) var(--motion-ease-standard);
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,14 +1,11 @@
 const home = {
-  title: 'Vue 3 + TypeScript Template',
-  subtitle: 'A minimal, opinionated starting point for Vue 3 projects using Feature Sliced Design.',
-  viewGuide: 'View Guide',
-  stackTitle: "What's included",
+  title: 'Search Bar Component',
+  description: 'A Vue search component with mock data.',
   searchDemo: {
-    title: 'Find your next thought.',
-    description:
-      'Try “decision”, “design”, “tokens”, or “deployment”, or choose a scenario to explore empty and error states.',
     open: 'Search workspace',
-    scenario: 'Demo scenario',
+    hint: 'Try “decision”, “design”, “tokens”, or “canary”.',
+    catalog: '{count} sample items · {scopes} scopes',
+    scenario: 'Scenario',
     default: 'Results and suggestions',
     empty: 'No results',
     error: 'Service unavailable',
@@ -23,9 +20,7 @@ const home = {
       'design-files': 'Design files',
     },
   },
-  meta: {
-    title: 'Home',
-  },
+  meta: { title: 'Search Bar Component · Orbi Search' },
 } as const
 
 export default home

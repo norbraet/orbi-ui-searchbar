@@ -1,6 +1,10 @@
 @layer semantics {
   :root,
   [data-theme] {
+    --motion-transition-colors:
+      background-color var(--motion-normal) var(--motion-ease-standard),
+      color var(--motion-normal) var(--motion-ease-standard),
+      border-color var(--motion-normal) var(--motion-ease-standard);
     --motion-fast: var(--motion-duration-fast);
     --motion-normal: var(--motion-duration-normal);
     --motion-emphasized: var(--motion-duration-moderate);

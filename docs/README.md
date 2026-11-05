@@ -1,6 +1,6 @@
 # Project scope
 
-This project explores a macOS-inspired search palette for web applications: a focused overlay that
+Orbi Search is a frontend spike exploring a macOS-inspired search palette for web applications: a focused overlay that
 helps people find, recognize, preview, and open content without losing their place in the application.
 
 This document is the working entry point for contributors and coding agents. The root

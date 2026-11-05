@@ -11,9 +11,7 @@ import { resolveInitialLocale } from '@/shared/i18n/lib/detectLocale'
 import { setStoredLocale } from '@/shared/i18n/lib/persistLocale'
 import type { MessageSchema } from '@/shared/i18n/types'
 import commonEn from '@/shared/i18n/model/messages/en/common'
-import navEn from '@/shared/i18n/model/messages/en/nav'
 import commonDe from '@/shared/i18n/model/messages/de/common'
-import navDe from '@/shared/i18n/model/messages/de/nav'
 import themeEn from '@/features/theme/i18n/en'
 import themeDe from '@/features/theme/i18n/de'
 import notificationsEn from '@/features/notifications/i18n/en'
@@ -22,16 +20,12 @@ import languageSelectorEn from '@/features/language-selector/i18n/en'
 import languageSelectorDe from '@/features/language-selector/i18n/de'
 import homeEn from '@/pages/home/i18n/en'
 import homeDe from '@/pages/home/i18n/de'
-import guideEn from '@/pages/guide/i18n/en'
-import guideDe from '@/pages/guide/i18n/de'
 import notFoundEn from '@/pages/not-found/i18n/en'
 import notFoundDe from '@/pages/not-found/i18n/de'
 
 const en = {
   common: commonEn,
-  nav: navEn,
   home: homeEn,
-  guide: guideEn,
   notFound: notFoundEn,
   theme: themeEn,
   notifications: notificationsEn,
@@ -40,9 +34,7 @@ const en = {
 
 const de = {
   common: commonDe,
-  nav: navDe,
   home: homeDe,
-  guide: guideDe,
   notFound: notFoundDe,
   theme: themeDe,
   notifications: notificationsDe,

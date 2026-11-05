@@ -12,6 +12,7 @@
     --size-control-sm: var(--space-8);
     --size-control-md: 2.25rem;
     --size-control-lg: 2.75rem;
+    --size-icon-xs: var(--space-3);
     --size-icon-sm: var(--space-5);
     --layout-max-width: 72rem;
     --layout-sidebar-width: 16rem;

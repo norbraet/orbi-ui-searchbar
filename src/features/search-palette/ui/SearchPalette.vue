@@ -18,6 +18,7 @@
     SearchPaletteLabels,
     SearchResult,
     SearchService,
+    SearchScope,
   } from '@/features/search-palette/types'
   import '../style.css'
 
@@ -25,12 +26,13 @@
     defineProps<{
       search: SearchService
       context?: SearchContext
+      scopes?: readonly SearchScope[]
       labels?: Partial<SearchPaletteLabels>
       debounceMs?: number
       /** false disables the shortcut; otherwise use Cmd/Ctrl plus this character. */
       shortcut?: string | false
     }>(),
-    { debounceMs: 180, shortcut: 'k' }
+    { debounceMs: 180, shortcut: 'k', scopes: () => [] }
   )
   const isOpen = defineModel<boolean>('open', { default: false })
   const emit = defineEmits<{ activate: [result: SearchResult] }>()
@@ -42,6 +44,7 @@
   const palette = useSearchPalette({
     search: (request) => props.search(request),
     context: () => props.context,
+    scopes: () => props.scopes,
     debounceMs: props.debounceMs,
   })
   const { state, selectedResult } = palette
@@ -230,6 +233,9 @@
     <SearchPaletteContent
       ref="content"
       :query="visibleState.query"
+      :scopes="scopes"
+      :scope-id="visibleState.scopeId"
+      :scope-counts="visibleState.scopeCounts"
       :status="visibleState.status"
       :results="visibleState.results"
       :suggestions="visibleState.suggestions"
@@ -237,6 +243,7 @@
       :selected-result="visibleResult"
       :labels="labels"
       @query="palette.setQuery"
+      @scope="palette.toggleScope"
       @select="palette.select"
       @move="palette.moveSelection"
       @activate="activate"

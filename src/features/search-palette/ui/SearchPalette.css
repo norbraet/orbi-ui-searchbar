@@ -101,6 +101,66 @@
   opacity: 1;
 }
 
+.search-palette-scopes {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-component-xs);
+  padding: var(--space-component-xs) var(--space-component-md);
+  overflow-x: auto;
+  border-bottom: var(--border-width-thin) solid var(--color-border);
+  scrollbar-width: thin;
+}
+
+.search-palette .search-palette-scope {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-component-nano);
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--size-control-lg);
+  padding: var(--space-component-xs) var(--space-component-sm);
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: transparent;
+  font-size: var(--text-caption-size);
+  overflow-wrap: anywhere;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease-standard),
+    border-color var(--motion-fast) var(--motion-ease-standard);
+}
+
+.search-palette-scope[aria-pressed='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.search-palette-scope-check {
+  flex-shrink: 0;
+  width: var(--text-body-size);
+  transition: opacity var(--motion-fast) var(--motion-ease-standard);
+}
+
+.search-palette-scope[aria-pressed='false'] .search-palette-scope-check {
+  opacity: 0;
+}
+
+.search-palette-scope-count {
+  flex-shrink: 0;
+  min-width: var(--size-icon-sm);
+  padding: 0 var(--space-component-nano);
+  border-radius: var(--radius-tag);
+  background: var(--color-surface-sunken);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.search-palette-scope-count[data-hidden='true'] {
+  visibility: hidden;
+}
+
 .search-palette-close {
   flex-shrink: 0;
   padding: var(--space-component-nano) var(--space-component-xs);
@@ -176,6 +236,10 @@
   margin-bottom: var(--space-component-md);
 }
 
+.search-palette-message > p:last-child {
+  margin-bottom: 0;
+}
+
 .search-palette-preview {
   flex: 0 0 44%;
   min-width: 0;
@@ -234,6 +298,7 @@
 
 @media (hover: hover) {
   .search-palette-action:hover,
+  .search-palette-scope:hover,
   .search-palette-suggestion:hover,
   .search-palette-close:hover {
     border-color: var(--color-primary);
@@ -270,6 +335,7 @@
   border-top: var(--border-width-thin) solid var(--color-border);
   font-size: var(--text-caption-size);
   color: var(--color-text-muted);
+  overflow-wrap: anywhere;
 }
 
 .search-palette-sr-only {

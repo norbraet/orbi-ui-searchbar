@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search scope consumer</title>
+    <link rel="stylesheet" href="/src/app/styles/tokens.css" />
+  </head>
+  <body>
+    <div id="consumer"></div>
+    <script type="module">
+      import { createApp, h, ref } from 'vue'
+      import { SearchPalette } from '/src/features/search-palette/index.ts'
+      import {
+        createMockSearchService,
+        mockSearchScopes,
+      } from '/src/features/search-palette/mocks/index.ts'
+
+      const params = new URLSearchParams(location.search)
+      createApp({
+        setup() {
+          const open = ref(false)
+          const scopes = ref([...mockSearchScopes])
+          const requests = ref([])
+          const provider = createMockSearchService(params.get('scenario') ?? 'default')
+          const search = async (request) => {
+            requests.value.push({ query: request.query, scopeId: request.scopeId ?? null })
+            const response = await provider(request)
+            if (params.has('no-counts')) delete response.scopeCounts
+            return response
+          }
+          return () =>
+            h('main', [
+              h('h1', 'Search scope consumer'),
+              h(
+                'button',
+                {
+                  onClick: () => {
+                    open.value = true
+                  },
+                },
+                'Open search'
+              ),
+              h(SearchPalette, {
+                open: open.value,
+                'onUpdate:open': (value) => {
+                  open.value = value
+                },
+                scopes: scopes.value,
+                search,
+                debounceMs: 50,
+              }),
+              h(
+                'button',
+                {
+                  id: 'remove-scopes',
+                  onClick: () => {
+                    scopes.value = []
+                  },
+                },
+                'Remove scopes'
+              ),
+              h('output', { id: 'requests' }, JSON.stringify(requests.value)),
+            ])
+        },
+      }).mount('#consumer')
+    </script>
+  </body>
+</html>

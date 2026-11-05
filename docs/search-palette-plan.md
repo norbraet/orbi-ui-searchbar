@@ -7,8 +7,12 @@ Working branch: `feat/search-palette`.
 The first complete flow is implemented: service contract and searchable mock fixtures, headless behavior,
 controlled Vue component, keyboard/pointer navigation, previews, suggestions, loading/empty/error
 states, and a home-page demo. The reusable component uses the shared token foundation and has no application-provider
-dependency. Closing resets the search; scope filters, history/pinning, and library distribution
+dependency. Closing resets the search; history/pinning and library distribution
 packaging remain follow-up work.
+
+Scope chips now provide an optional, host-defined single scope, service-owned facet counts, and
+query-preserving recovery. See the [scope chip interaction plan](scope-chips-plan.md) for the UX,
+service boundary, and possible extensions.
 
 The demo mock now searches 32 fixtures, with suggestions only for an empty query. Simple matching
 lives behind the service boundary; unknown queries produce an empty state with separate recovery

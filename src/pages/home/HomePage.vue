@@ -1,9 +1,6 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n'
-  import { useThemeStore } from '@/features/theme/model/useThemeStore'
-  import { THEME_OPTIONS } from '@/features/theme/config'
-  import { BaseButton } from '@/shared/components/BaseButton'
   import { computed, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import {
     SearchPalette,
     searchPaletteLabels,
@@ -13,21 +10,27 @@
   import {
     createMockSearchService,
     mockSearchScopes,
+    mockSearchResults,
     type MockScenario,
   } from '@/features/search-palette/mocks'
 
   const { t, locale } = useI18n()
-  const appStore = useThemeStore()
   const searchOpen = ref(false)
   const searchContext = { workspace: 'demo' }
   const scenario = ref<MockScenario>('default')
   const search = computed(() => createMockSearchService(scenario.value))
   const scopes = computed(() =>
-    mockSearchScopes.map((scope) => ({ ...scope, label: t(`home.searchDemo.scopes.${scope.id}`) }))
+    mockSearchScopes.map((scope) => ({ ...scope, label: t('home.searchDemo.scopes.' + scope.id) }))
   )
   const searchLabels = computed(() =>
     locale.value === 'de' ? searchPaletteLabelsDe : searchPaletteLabels
   )
+  function openSearch(event: MouseEvent) {
+    // Safari does not focus buttons on click; give the dialog a return target.
+    const launcher = event.currentTarget as HTMLButtonElement
+    launcher.focus()
+    searchOpen.value = true
+  }
 
   function openSearchResult(result: SearchResult) {
     const url = new URL(result.url, window.location.origin)
@@ -35,125 +38,39 @@
       window.open(url.href, '_blank', 'noopener,noreferrer')
     }
   }
-
-  const getThemeLabel = (theme: string) => t(`theme.options.${theme}`)
-
-  const toggleTheme = () => {
-    switch (appStore.theme) {
-      case 'dark': {
-        appStore.setTheme(THEME_OPTIONS.LIGHT)
-        appStore.addNotification(
-          t('theme.switchedTo', { theme: getThemeLabel(THEME_OPTIONS.LIGHT) }),
-          'info'
-        )
-        break
-      }
-      case 'light': {
-        appStore.setTheme(THEME_OPTIONS.SYSTEM)
-        appStore.addNotification(
-          t('theme.switchedTo', { theme: getThemeLabel(THEME_OPTIONS.SYSTEM) }),
-          'info'
-        )
-        break
-      }
-      case 'system': {
-        appStore.setTheme(THEME_OPTIONS.DARK)
-        appStore.addNotification(
-          t('theme.switchedTo', { theme: getThemeLabel(THEME_OPTIONS.DARK) }),
-          'info'
-        )
-        break
-      }
-    }
-  }
-
-  const stack = [
-    {
-      label: 'Vue 3',
-      link: 'https://vuejs.org/',
-    },
-    {
-      label: 'TypeScript',
-      link: 'https://www.typescriptlang.org/',
-    },
-    {
-      label: 'Vite',
-      link: 'https://vite.dev/',
-    },
-    {
-      label: 'Vue Router',
-      link: 'https://router.vuejs.org/',
-    },
-    {
-      label: 'Pinia Store',
-      link: 'https://pinia.vuejs.org/',
-    },
-    {
-      label: 'Vue I18n',
-      link: 'https://vue-i18n.intlify.dev/',
-    },
-    {
-      label: 'Zod',
-      link: 'https://zod.dev/',
-    },
-    {
-      label: 'ESLint',
-      link: 'https://eslint.org/',
-    },
-    {
-      label: 'Prettier',
-      link: 'https://prettier.io/',
-    },
-    {
-      label: 'Lefthook',
-      link: 'https://github.com/evilmartians/lefthook',
-    },
-    {
-      label: 'Feature Sliced Design',
-      link: 'https://feature-sliced.design/',
-    },
-    {
-      label: 'mise',
-      link: 'https://mise.jdx.dev/',
-    },
-    {
-      label: 'Commitlint',
-      link: 'https://commitlint.js.org/',
-    },
-    {
-      label: 'Vitest',
-      link: 'https://vitest.dev/',
-    },
-    {
-      label: 'Vue Test Utils',
-      link: 'https://test-utils.vuejs.org/',
-    },
-  ]
 </script>
 
 <template>
-  <div class="container">
-    <section class="search-demo" :aria-label="t('home.searchDemo.title')">
-      <div>
-        <h2>{{ t('home.searchDemo.title') }}</h2>
-        <p>{{ t('home.searchDemo.description') }}</p>
-      </div>
-      <div class="search-demo-actions">
-        <BaseButton @click="searchOpen = true"
-          >{{ t('home.searchDemo.open') }} <kbd>⌘ / Ctrl + K</kbd></BaseButton
-        >
-        <label class="search-demo-scenario" for="search-demo-scenario">
-          {{ t('home.searchDemo.scenario') }}
-          <select id="search-demo-scenario" v-model="scenario">
-            <option value="default">{{ t('home.searchDemo.default') }}</option>
-            <option value="empty">{{ t('home.searchDemo.empty') }}</option>
-            <option value="error">{{ t('home.searchDemo.error') }}</option>
-            <option value="slow">{{ t('home.searchDemo.slow') }}</option>
-            <option value="no-preview">{{ t('home.searchDemo.noPreview') }}</option>
-          </select>
-        </label>
-      </div>
-    </section>
+  <div class="playground">
+    <h1>{{ t('home.title') }}</h1>
+    <p class="description">{{ t('home.description') }}</p>
+    <div class="launch-controls">
+      <button class="search-launcher" type="button" aria-haspopup="dialog" @click="openSearch">
+        {{ t('home.searchDemo.open') }}
+      </button>
+      <span class="shortcut"><kbd>⌘ / Ctrl + K</kbd></span>
+    </div>
+    <p class="search-hint">{{ t('home.searchDemo.hint') }}</p>
+    <div class="demo-settings">
+      <label for="search-demo-scenario"
+        ><span class="scenario-label">{{ t('home.searchDemo.scenario') }}</span>
+        <select id="search-demo-scenario" v-model="scenario">
+          <option value="default">{{ t('home.searchDemo.default') }}</option>
+          <option value="empty">{{ t('home.searchDemo.empty') }}</option>
+          <option value="error">{{ t('home.searchDemo.error') }}</option>
+          <option value="slow">{{ t('home.searchDemo.slow') }}</option>
+          <option value="no-preview">{{ t('home.searchDemo.noPreview') }}</option>
+        </select>
+      </label>
+      <p class="catalog">
+        {{
+          t('home.searchDemo.catalog', {
+            count: mockSearchResults.length,
+            scopes: mockSearchScopes.length,
+          })
+        }}
+      </p>
+    </div>
     <SearchPalette
       v-model:open="searchOpen"
       :search="search"
@@ -162,134 +79,112 @@
       :context="searchContext"
       @activate="openSearchResult"
     />
-    <section class="hero">
-      <h1>{{ t('home.title') }}</h1>
-      <p>{{ t('home.subtitle') }}</p>
-      <div class="hero-actions">
-        <BaseButton variant="primary" to="/guide">{{ t('home.viewGuide') }}</BaseButton>
-        <BaseButton @click="toggleTheme">
-          {{ t('theme.currentLabel', { theme: t(`theme.options.${appStore.theme}`) }) }}
-        </BaseButton>
-      </div>
-    </section>
-
-    <section class="stack card">
-      <h2>{{ t('home.stackTitle') }}</h2>
-      <div class="badge-grid">
-        <a
-          v-for="tool in stack"
-          :key="tool.label"
-          :href="tool.link"
-          class="badge"
-          target="_blank"
-          rel="noopener noreferrer"
-          >{{ tool.label }}</a
-        >
-      </div>
-    </section>
   </div>
 </template>
 
-<style lang="css" scoped>
-  .search-demo {
-    display: grid;
-    gap: var(--space-component-xl);
-    padding: var(--space-component-xl);
-    border: var(--border-width-thin) solid var(--color-border);
-    border-radius: var(--radius-card);
-    background: var(--color-surface);
+<style scoped>
+  .playground {
+    width: min(100%, 44rem);
+    margin-inline: auto;
+    padding: var(--space-section) var(--space-page);
+    overflow-wrap: anywhere;
   }
 
-  .search-demo h2 {
-    margin-bottom: var(--space-component-xs);
+  h1 {
+    margin-bottom: var(--space-component-md);
+    font-size: var(--text-h1-size);
+    line-height: var(--text-line-tight);
   }
 
-  .search-demo-actions {
+  .description {
+    color: var(--color-text-muted);
+  }
+
+  .launch-controls {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-component-sm);
-    justify-content: flex-start;
     align-items: center;
+    gap: var(--space-component-md);
+    margin-top: var(--space-component-xl);
   }
 
-  .search-demo-scenario {
-    display: flex;
-    align-items: center;
-    gap: var(--space-component-xs);
-  }
-
-  .search-demo select {
+  .search-launcher {
+    transition: var(--motion-transition-colors);
+    min-height: var(--size-control-lg);
+    padding: var(--space-component-sm) var(--space-component-xl);
+    border: var(--border-width-thin) solid transparent;
+    border-radius: var(--radius-button);
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
     font: inherit;
-    color: var(--color-text);
-    background: var(--color-surface);
+    font-weight: var(--text-label-weight);
+    cursor: pointer;
+  }
+
+  .search-launcher:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .search-launcher:active {
+    background: var(--color-primary-active);
+  }
+
+  .shortcut,
+  .search-hint,
+  .catalog {
+    transition: var(--motion-transition-colors);
+    color: var(--color-text-muted);
+    font-size: var(--text-caption-size);
+  }
+
+  kbd {
+    font-family: var(--text-mono-font);
+  }
+
+  .search-hint {
+    margin-top: var(--space-component-md);
+  }
+
+  .demo-settings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-component-sm);
+    margin-top: var(--space-section);
+    padding-top: var(--space-component-xl);
+    border-top: var(--border-width-thin) solid var(--color-border);
+    font-size: var(--text-small-size);
+  }
+
+  select {
+    transition: var(--motion-transition-colors);
+    min-height: var(--size-control-sm);
+    max-width: 100%;
     padding: var(--space-component-xs);
     border: var(--border-width-thin) solid var(--color-border);
-    border-radius: var(--radius-tag);
-  }
-
-  .hero {
-    text-align: center;
-    /* stylelint-disable-next-line plugin/no-hardcoded-spacing */
-    padding: 5rem 1rem 4rem;
-  }
-
-  .hero h1 {
-    /* stylelint-disable-next-line plugin/no-hardcoded-typography */
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: var(--text-display-weight);
-    letter-spacing: var(--text-spacing-heading);
-    line-height: var(--text-line-tight);
-    margin-bottom: var(--space-component-xl);
-    color: var(--color-primary);
-  }
-
-  .hero p {
-    font-size: var(--text-lg-size);
-    max-width: 500px;
-    margin: 0 auto var(--space-content);
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: var(--space-component-sm);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .stack {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: var(--space-component-md);
-    background-color: var(--color-bg-subtle);
-    border-radius: var(--radius-card);
-  }
-
-  .stack h2 {
-    font-size: var(--text-xs-size);
-    font-weight: var(--text-label-weight);
-    color: var(--color-text-muted);
-    letter-spacing: var(--text-spacing-label);
-    text-transform: uppercase;
-    margin-bottom: var(--space-component-md);
-  }
-
-  .badge-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-component-xs);
-  }
-
-  .badge-grid a.badge {
-    text-decoration: none;
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
     color: var(--color-text);
-    padding: var(--space-component-nano);
-    background-color: var(--color-surface-raised);
-    border-radius: var(--radius-tag);
+    font: inherit;
   }
 
-  .badge-grid a.badge:hover {
-    background-color: var(--color-primary-subtle);
-    color: var(--color-primary);
-    border-color: var(--color-primary-subtle);
+  .scenario-label {
+    color: var(--color-text);
+    transition: var(--motion-transition-colors);
+  }
+
+  label {
+    display: block;
+    min-width: 0;
+  }
+
+  .catalog {
+    flex-basis: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .playground {
+      padding-inline: var(--space-component-md);
+    }
   }
 </style>

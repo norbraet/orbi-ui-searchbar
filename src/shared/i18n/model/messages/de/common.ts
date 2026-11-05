@@ -1,6 +1,7 @@
 const common = {
-  appName: 'Vue-3-Vorlage',
-  footerStack: 'Feature Sliced Design · Vue 3 · TypeScript · Pinia · Vue Router · Vue I18n · Zod',
+  appName: 'Orbi Search',
+  skipToContent: 'Zum Inhalt springen',
+  appearance: 'Darstellung',
 } as const
 
 export default common

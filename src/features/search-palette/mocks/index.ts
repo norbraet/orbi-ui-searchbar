@@ -5,6 +5,7 @@ import type {
   SearchSuggestion,
 } from '@/features/search-palette/types'
 import { mockSearchResults } from '@/features/search-palette/mocks/fixtures'
+export { mockSearchResults } from '@/features/search-palette/mocks/fixtures'
 
 export type MockScenario = 'default' | 'empty' | 'error' | 'slow' | 'no-preview'
 

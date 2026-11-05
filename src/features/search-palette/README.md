@@ -26,7 +26,8 @@ a separate step.
 </template>
 ```
 
-The service receives `{ query, context, signal }` and returns a promise for `{ results, suggestions? }`.
+The service receives `{ query, scopeId?, context, signal }` and returns a promise for
+`{ results, suggestions?, scopeCounts? }`.
 The empty query is sent immediately on open to obtain suggestions. Empty or whitespace-only input
 shows suggestions only: provider result items are ignored, no item is selected, and the preview,
 result count, and no-matches message are hidden. Clearing a query requests suggestions immediately.
@@ -48,10 +49,46 @@ HTTP(S) and relative URLs, and failed images fall back to available text or the 
 
 ## Inputs and customization
 
+Supply optional scopes to enable the chip rail:
+
+```ts
+const scopes = [
+  { id: 'documents', label: 'Documents' },
+  { id: 'decisions', label: 'Decisions' },
+]
+// <SearchPalette :search="search" :scopes="scopes" />
+```
+
+Each scope needs a unique stable ID and a display label supplied by the host. IDs are opaque to the
+component: a host can define content types, projects, or sources. The service interprets `scopeId`;
+the reusable frontend does not filter results by their kind or source.
+
+All content is the default and sends an undefined `scopeId`. One scope is active at a time; activating
+the same chip again resets to All content. Scope changes cancel superseded work and search immediately
+with the current query. Clearing input retains the scope and requests suggestions; blank input still
+shows no content items or counts. Closing resets both query and scope. Removing the active scope from
+the supplied definitions returns to All content. Relabelling a scope does not trigger a search.
+
+Optional `scopeCounts` map scope IDs to nonnegative counts for the current query **before applying
+the selected scope**. For example, `{ documents: 5, decisions: 2 }` stays the same when switching
+between those two scopes. Do not derive these counts from the current filtered result page. Omit
+unknown counts rather than sending zero; real zero-count chips remain usable. Counts are hidden while
+loading or after an error, with their previous widths retained to limit layout shifts.
+
+An empty scoped search offers **Search all content**, preserving the query. Scope changes and retry
+do not implicitly broaden a search. Suggestions also belong to the service and should respect scope.
+
+The chip rail uses native buttons with `aria-pressed`. Tab reaches each chip; Enter/Space activates
+it. Left/right and Home/End move focus without selecting. Keyboard focus remains on the chip, while
+pointer activation can preserve input focus. On narrow screens the rail scrolls horizontally; focused
+chips are revealed within that rail without scrolling the palette's ancestors. Selected chips have
+both a checkmark and selected styling, and use the shared control-size token for touch targets.
+
 | Input          | Purpose                                                           | Default |
 | -------------- | ----------------------------------------------------------------- | ------- |
 | `v-model:open` | Coordinate opening and closing with the host                      | Closed  |
 | `search`       | Required asynchronous service callback                            | None    |
+| `scopes`       | Host-defined scope IDs and translated labels; omit to hide chips  | Empty   |
 | `context`      | Host-owned context record forwarded to the service                | None    |
 | `labels`       | Partial typed label overrides, including a result-count formatter | English |
 | `debounceMs`   | Delay after query changes; set when creating the instance         | 180 ms  |
@@ -94,10 +131,15 @@ consumer that loads only the shared token foundation and component styles.
 ## Headless usage
 
 `useSearchPalette({ search, context?, debounceMs? })` exposes readonly `state` and `selectedResult`,
-plus `open`, `close`, `setQuery`, `select`, `moveSelection`, `retry`, `activate`, and `dispose`.
+plus `open`, `close`, `setQuery`, `setScope`, `toggleScope`, `select`, `moveSelection`, `retry`,
+`activate`, and `dispose`.
 `context` can be a reactive value or getter. `activate(id?)` validates and selects a supplied result ID,
 or uses the current selection when omitted. It returns a result or `null`; it does not close
 or navigate, leaving those decisions to the UI integration. Closing resets query and responses.
+`scopes` accepts a reactive value or getter, just like `context`. `setScope(id | null)` validates and
+selects an exact scope; `toggleScope(id | null)` additionally clears an already-active scope. State
+exposes `scopeId` and the provider's `scopeCounts`. Counts are current only after a successful request;
+the previous response's counts are retained during loading for stable chip widths.
 
 The composable cancels superseded work and ignores stale responses even if a service ignores its
 abort signal. It cleans up with its Vue effect scope. Call `dispose()` manually if creating it outside
@@ -121,6 +163,8 @@ entry, and does not provide production ranking, fuzzy search, or indexing.
 Try `decision`, `design`, `tokens`, `deployment`, `Figma`, or `release checklist`. `canary` demonstrates
 matching preview content, and `ubergabe` finds the German handoff note. Unknown queries return no
 results and offer recovery suggestions separately. Clearing the input restores suggestions only.
+The demo supplies scopes for Documents, Decisions, Links, Issues, Notes, and Design files. Try
+`design` with Decisions, or `release checklist` with Links to exercise zero counts and broadening.
 
 Empty, error, and slow scenarios remain available. The missing-preview scenario searches the same
 catalog and uses the same suggestions as normal search, but omits preview metadata from returned
@@ -130,12 +174,16 @@ Additional workspace fixture destinations open the demo guide with an item ident
 separate backend document pages.
 
 - `model/useSearchPalette.test.ts`: Node tests for requests, races, selection, context, and lifecycle.
+- `model/useSearchPalette.scopes.test.ts`: scope validation, immediate requests, stale responses,
+  configuration changes, and lifecycle resets.
 - `mocks/index.test.ts`: fixture matching, suggestions, fallback scenarios, cancellation, and isolation.
 - `ui/SearchPalette.test.ts`: provider-free server-rendering check.
 - `ui/SearchPalette.stories.ts`: component examples and a keyboard interaction check.
 - `e2e/specs/search-palette.spec.ts`: actual browser behavior using `e2e/fixtures/search-palette.html`,
   which imports Vue, the public component entry, and shared tokens, without app reset/base styles or
   providers. It also verifies that shared theme and token overrides reach the palette.
+- `e2e/specs/search-scopes.spec.ts`: provider counts, keyboard/touch controls, empty recovery, host
+  configuration changes, optional counts, mobile scrolling, and accessibility checks.
 
 Use the repository's unit and Storybook commands. Run the browser suite with
-`pnpm exec playwright test e2e/specs/search-palette.spec.ts --project=chromium --project=webkit`.
+`pnpm exec playwright test search-palette search-scopes --project=chromium --project=webkit`.

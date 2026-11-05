@@ -10,6 +10,8 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
   const state = reactive({
     isOpen: false,
     query: '',
+    scopeId: null as string | null,
+    scopeCounts: {} as Record<string, number>,
     status: 'idle' as SearchStatus,
     results: [] as SearchResult[],
     suggestions: [] as SearchSuggestion[],
@@ -35,6 +37,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
   }
 
   function clearResponse() {
+    // Retain count widths during loading; presentation hides these until success.
     state.results = []
     state.suggestions = []
     state.selectedId = null
@@ -53,6 +56,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     try {
       const response = await options.search({
         query,
+        scopeId: state.scopeId ?? undefined,
         context: toValue(options.context),
         signal: activeController.signal,
       })
@@ -62,6 +66,7 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
       // Empty input is a suggestions-only state, even if a provider returns items.
       state.results = query ? response.results : []
       state.suggestions = response.suggestions ?? []
+      state.scopeCounts = query ? (response.scopeCounts ?? {}) : {}
       state.selectedId = state.results[0]?.id ?? null
       state.status = 'success'
     } catch (error) {
@@ -101,6 +106,8 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     invalidate()
     state.isOpen = false
     state.query = ''
+    state.scopeId = null
+    state.scopeCounts = {}
     clearResponse()
     state.status = 'idle'
   }
@@ -110,6 +117,17 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
 
     state.query = query
     schedule(!query.trim())
+  }
+
+  function setScope(id: string | null) {
+    if (disposed || id === state.scopeId) return
+    if (id !== null && !toValue(options.scopes)?.some((scope) => scope.id === id)) return
+    state.scopeId = id
+    schedule(true)
+  }
+
+  function toggleScope(id: string | null) {
+    setScope(id === state.scopeId ? null : id)
   }
 
   function select(id: string) {
@@ -152,9 +170,18 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     { deep: true, flush: 'sync' }
   )
 
+  const stopScopesWatch = watch(
+    () => toValue(options.scopes)?.map((scope) => scope.id),
+    (ids) => {
+      if (state.scopeId !== null && !ids?.includes(state.scopeId)) setScope(null)
+    },
+    { flush: 'sync' }
+  )
+
   function dispose() {
     disposed = true
     stopContextWatch()
+    stopScopesWatch()
     close()
   }
 
@@ -166,6 +193,8 @@ export function useSearchPalette(options: UseSearchPaletteOptions) {
     open,
     close,
     setQuery,
+    setScope,
+    toggleScope,
     select,
     moveSelection,
     activate,

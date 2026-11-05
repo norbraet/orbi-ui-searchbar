@@ -3,15 +3,20 @@
   import type { VNode } from 'vue'
   import { calculatePanelHeight, calculateScrollTop } from '@/shared/lib/layout'
   import { getPreviewImageUrl } from '@/shared/lib/url'
+  import SearchScopeChips from './SearchScopeChips.vue'
   import type {
     SearchPaletteLabels,
     SearchResult,
     SearchStatus,
     SearchSuggestion,
+    SearchScope,
   } from '@/features/search-palette/types'
 
   const props = defineProps<{
     query: string
+    scopes: readonly SearchScope[]
+    scopeId: string | null
+    scopeCounts: Readonly<Record<string, number>>
     status: SearchStatus
     results: readonly SearchResult[]
     suggestions: readonly SearchSuggestion[]
@@ -21,6 +26,7 @@
   }>()
   const emit = defineEmits<{
     query: [value: string]
+    scope: [id: string | null]
     select: [id: string]
     move: [direction: -1 | 1]
     activate: [id?: string]
@@ -33,6 +39,7 @@
   }>()
 
   const input = ref<HTMLInputElement | null>(null)
+  const scopeChips = ref<InstanceType<typeof SearchScopeChips> | null>(null)
   const body = ref<HTMLElement | null>(null)
   const resultsPane = ref<HTMLElement | null>(null)
   const resultsContent = ref<HTMLElement | null>(null)
@@ -42,6 +49,18 @@
   const listId = useId()
   const labelId = useId()
   const hasQuery = computed(() => Boolean(props.query.trim()))
+  const selectedScope = computed(() => props.scopes.find((scope) => scope.id === props.scopeId))
+
+  watch(
+    () => props.scopes.map((scope) => scope.id),
+    async () => {
+      const focused = input.value?.ownerDocument.activeElement
+      if (!focused || !scopeChips.value?.contains(focused)) return
+      await nextTick()
+      if (!focused.isConnected) input.value?.focus()
+    },
+    { flush: 'pre' }
+  )
 
   function measureContent() {
     const area = body.value
@@ -120,7 +139,9 @@
     if (props.status === 'loading') return props.labels.loading
     if (props.status === 'error') return props.labels.error
     if (props.status === 'success' && hasQuery.value)
-      return props.labels.resultCount(props.results.length)
+      return [props.labels.resultCount(props.results.length), selectedScope.value?.label]
+        .filter(Boolean)
+        .join(' · ')
     return ''
   })
   const failedImage = ref<string | null>(null)
@@ -131,6 +152,11 @@
 
   function applySuggestion(query: string) {
     emit('query', query)
+    input.value?.focus()
+  }
+
+  function clearScope() {
+    emit('scope', null)
     input.value?.focus()
   }
 
@@ -214,12 +240,28 @@
     </button>
   </div>
 
+  <SearchScopeChips
+    v-if="scopes.length"
+    ref="scopeChips"
+    :scopes="scopes"
+    :selected-id="scopeId"
+    :counts="scopeCounts"
+    :show-counts="hasQuery && status === 'success'"
+    :labels="labels"
+    @select="emit('scope', $event)"
+  />
+
   <div
     ref="body"
     class="search-palette-body"
     :style="bodyHeight === undefined ? undefined : { height: `${bodyHeight}px` }"
   >
-    <section ref="resultsPane" class="search-palette-results" :aria-label="labels.results">
+    <section
+      ref="resultsPane"
+      class="search-palette-results"
+      :aria-label="labels.results"
+      :tabindex="results.length ? 0 : undefined"
+    >
       <div ref="resultsContent" class="search-palette-results-content">
         <div
           :id="listId"
@@ -236,7 +278,7 @@
             tabindex="-1"
             :aria-selected="result.id === selectedId"
             class="search-palette-result"
-            @pointerenter="emit('select', result.id)"
+            @pointermove="$event.pointerType === 'mouse' && emit('select', result.id)"
             @mousedown.prevent
             @click="emit('activate', result.id)"
             @keydown.enter.prevent="emit('activate', result.id)"
@@ -258,12 +300,20 @@
             {{ labels.retry }}
           </button>
         </div>
-        <p
+        <div
           v-else-if="hasQuery && status === 'success' && !results.length"
           class="search-palette-message"
         >
-          {{ labels.empty }}
-        </p>
+          <p>{{ labels.empty }}</p>
+          <button
+            v-if="scopeId !== null"
+            class="search-palette-action"
+            type="button"
+            @click="clearScope"
+          >
+            {{ labels.clearScope }}
+          </button>
+        </div>
         <div
           v-if="suggestions.length"
           class="search-palette-suggestions"

@@ -10,6 +10,7 @@ export type {
   SearchService,
   SearchStatus,
   SearchSuggestion,
+  SearchScope,
   SearchPaletteLabels,
   UseSearchPaletteOptions,
 } from './types'

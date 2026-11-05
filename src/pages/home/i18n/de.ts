@@ -15,6 +15,14 @@ const home = {
     error: 'Dienst nicht verfügbar',
     slow: 'Langsame Antwort',
     noPreview: 'Fehlende Vorschau',
+    scopes: {
+      documents: 'Dokumente',
+      decisions: 'Entscheidungen',
+      links: 'Links',
+      issues: 'Tickets',
+      notes: 'Notizen',
+      'design-files': 'Designdateien',
+    },
   },
   meta: {
     title: 'Startseite',

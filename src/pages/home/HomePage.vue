@@ -10,13 +10,21 @@
     searchPaletteLabelsDe,
   } from '@/features/search-palette'
   import type { SearchResult } from '@/features/search-palette'
-  import { createMockSearchService, type MockScenario } from '@/features/search-palette/mocks'
+  import {
+    createMockSearchService,
+    mockSearchScopes,
+    type MockScenario,
+  } from '@/features/search-palette/mocks'
 
   const { t, locale } = useI18n()
   const appStore = useThemeStore()
   const searchOpen = ref(false)
+  const searchContext = { workspace: 'demo' }
   const scenario = ref<MockScenario>('default')
   const search = computed(() => createMockSearchService(scenario.value))
+  const scopes = computed(() =>
+    mockSearchScopes.map((scope) => ({ ...scope, label: t(`home.searchDemo.scopes.${scope.id}`) }))
+  )
   const searchLabels = computed(() =>
     locale.value === 'de' ? searchPaletteLabelsDe : searchPaletteLabels
   )
@@ -149,8 +157,9 @@
     <SearchPalette
       v-model:open="searchOpen"
       :search="search"
+      :scopes="scopes"
       :labels="searchLabels"
-      :context="{ workspace: 'demo' }"
+      :context="searchContext"
       @activate="openSearchResult"
     />
     <section class="hero">

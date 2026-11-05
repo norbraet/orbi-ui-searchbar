@@ -22,6 +22,14 @@ export interface MessageSchema {
       error: string
       slow: string
       noPreview: string
+      scopes: {
+        documents: string
+        decisions: string
+        links: string
+        issues: string
+        notes: string
+        'design-files': string
+      }
     }
     meta: {
       title: string

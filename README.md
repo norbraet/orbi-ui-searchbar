@@ -2,6 +2,10 @@
 
 A Vue search component with mock data.
 
+![Search demo showing keyboard navigation, content previews, scope filtering, and recovery from an empty result](docs/media/search-demo.gif)
+
+[Watch or download the screen recording (WebM)](docs/media/search-demo.webm).
+
 This is a frontend spike: a place to explore interaction and establish a component foundation before
 connecting it to a real application. Search responses come from a local fixture service. There is no
 production search backend or GraphQL schema in this repository.
